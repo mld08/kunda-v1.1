@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block title %}Créer une Finance - Système de Gestion{% endblock %}
+{% block page_title %}Ajouter une Nouvelle Finance{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Informations financières</h3>
+                    <p class="mt-1 text-sm text-gray-500">Remplissez les informations pour ajouter une nouvelle entrée financière</p>
+                </div>
+                <a href="{{ url_for('finance_list') }}" 
+                   class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Retour
+                </a>
+            </div>
+        </div>
+
+        <form method="POST" class="px-6 py-6 space-y-6" x-data="financeForm()">
+            <!-- Basic Information -->
+            <div class="grid grid-cols-1 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label for="date" class="block text-sm font-medium text-gray-700 mb-1">
+                            Date <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date" 
+                               name="date" 
+                               id="date" 
+                               required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300">
+                    </div>
+
+                    <div>
+                        <label for="numero_compte" class="block text-sm font-medium text-gray-700 mb-1">
+                            Numéro de compte
+                        </label>
+                        <input type="text" 
+                               name="numero_compte" 
+                               id="numero_compte"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300"
+                               placeholder="Numéro du compte bancaire">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="libelle" class="block text-sm font-medium text-gray-700 mb-1">
+                        Libellé <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" 
+                           name="libelle" 
+                           id="libelle" 
+                           required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300"
+                           placeholder="Description de l'opération financière">
+                </div>
+            </div>
+
+            <!-- Credit/Debit -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Crédit / Débit</h4>
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <label for="credit" class="block text-sm font-medium text-gray-700 mb-1">
+                            Crédit (FCFA)
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-arrow-up text-green-400"></i>
+                            </div>
+                            <input type="number" 
+                                   name="credit" 
+                                   id="credit"
+                                   step="0.01"
+                                   min="0"
+                                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 pl-10"
+                                   placeholder="0.00"
+                                   x-on:input="calculateTTC()">
+                        </div>
+                        <p class="mt-1 text-sm text-green-600">Entrée d'argent (recettes)</p>
+                    </div>
+
+                    <div>
+                        <label for="debit" class="block text-sm font-medium text-gray-700 mb-1">
+                            Débit (FCFA)
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-arrow-down text-red-400"></i>
+                            </div>
+                            <input type="number" 
+                                   name="debit" 
+                                   id="debit"
+                                   step="0.01"
+                                   min="0"
+                                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 pl-10"
+                                   placeholder="0.00"
+                                   x-on:input="calculateTTC()">
+                        </div>
+                        <p class="mt-1 text-sm text-red-600">Sortie d'argent (dépenses)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Details -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Détails financiers</h4>
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div>
+                        <label for="montant_ht" class="block text-sm font-medium text-gray-700 mb-1">
+                            Montant HT (FCFA)
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-calculator text-gray-400"></i>
+                            </div>
+                            <input type="number" 
+                                   name="montant_ht" 
+                                   id="montant_ht"
+                                   step="0.01"
+                                   min="0"
+                                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 pl-10"
+                                   placeholder="0.00"
+                                   x-on:input="calculateTTC()">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="tva" class="block text-sm font-medium text-gray-700 mb-1">
+                            TVA (%)
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-400 text-sm">%</span>
+                            </div>
+                            <input type="number" 
+                                   name="tva" 
+                                   id="tva"
+                                   step="0.01"
+                                   min="0"
+                                   max="100"
+                                   value="18"
+                                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 pl-10"
+                                   placeholder="18"
+                                   x-on:input="calculateTTC()">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="montant_ttc" class="block text-sm font-medium text-gray-700 mb-1">
+                            Montant TTC (FCFA)
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-money-bill-wave text-gray-400"></i>
+                            </div>
+                            <input type="number" 
+                                   name="montant_ttc" 
+                                   id="montant_ttc"
+                                   step="0.01"
+                                   min="0"
+                                   readonly
+                                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 pl-10 font-medium"
+                                   placeholder="Calculé automatiquement">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Observations -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Informations complémentaires</h4>
+                <div>
+                    <label for="observations" class="block text-sm font-medium text-gray-700 mb-1">
+                        Observations
+                    </label>
+                    <textarea name="observations" 
+                              id="observations" 
+                              rows="4"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300"
+                              placeholder="Notes, remarques ou observations sur cette opération financière..."></textarea>
+                </div>
+            </div>
+
+            <!-- Summary Card -->
+            <div class="border-t border-gray-200 pt-6">
+                <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6 border border-green-200">
+                    <h4 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-chart-line mr-2 text-green-600"></i>
+                        Résumé de l'opération
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600" x-text="formatCurrency(credit)">0 FCFA</div>
+                            <div class="text-sm text-green-700">Crédit</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-red-600" x-text="formatCurrency(debit)">0 FCFA</div>
+                            <div class="text-sm text-red-700">Débit</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600" x-text="formatCurrency(montantTTC)">0 FCFA</div>
+                            <div class="text-sm text-blue-700">Montant TTC</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-6">
+                <button type="submit" 
+                        class="w-full inline-flex justify-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300"
+                        x-on:click="validateForm($event)">
+                    <i class="fas fa-plus mr-2"></i>
+                    Ajouter la finance
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function financeForm() {
+        return {
+            credit: 0,
+            debit: 0,
+            montantTTC: 0,
+            
+            calculateTTC() {
+                const credit = parseFloat(document.getElementById('credit').value) || 0;
+                const debit = parseFloat(document.getElementById('debit').value) || 0;
+                const montantHT = parseFloat(document.getElementById('montant_ht').value) || 0;
+                const tva = parseFloat(document.getElementById('tva').value) || 0;
+                
+                // Calculate TTC based on HT and TVA if HT is provided
+                if (montantHT > 0) {
+                    const calculatedTTC = montantHT + (montantHT * tva / 100);
+                    document.getElementById('montant_ttc').value = calculatedTTC.toFixed(2);
+                    this.montantTTC = calculatedTTC;
+                } else {
+                    // If no HT, use credit or debit as base
+                    const baseAmount = credit > 0 ? credit : debit;
+                    if (baseAmount > 0) {
+                        const calculatedTTC = baseAmount + (baseAmount * tva / 100);
+                        document.getElementById('montant_ttc').value = calculatedTTC.toFixed(2);
+                        this.montantTTC = calculatedTTC;
+                    }
+                }
+                
+                this.credit = credit;
+                this.debit = debit;
+            },
+            
+            formatCurrency(amount) {
+                return new Intl.NumberFormat('fr-FR').format(amount) + ' FCFA';
+            },
+            
+            validateForm(event) {
+                const credit = parseFloat(document.getElementById('credit').value) || 0;
+                const debit = parseFloat(document.getElementById('debit').value) || 0;
+                
+                if (credit > 0 && debit > 0) {
+                    event.preventDefault();
+                    alert('Vous ne pouvez pas avoir à la fois un crédit et un débit pour la même opération.');
+                    return false;
+                }
+                
+                if (credit === 0 && debit === 0) {
+                    event.preventDefault();
+                    alert('Veuillez saisir soit un montant de crédit, soit un montant de débit.');
+                    return false;
+                }
+                
+                return true;
+            }
+        };
+    }
+    
+    // Set today's date by default
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').value = today;
+    });
+</script>
+{% endblock %}

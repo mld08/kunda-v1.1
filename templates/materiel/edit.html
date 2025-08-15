@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}Modifier {{ materiel.nom_produit }} - Système de Gestion{% endblock %}
+{% block page_title %}Modifier le Matériel{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Modifier les informations du matériel</h3>
+                    <p class="mt-1 text-sm text-gray-500">Modifiez les informations de {{ materiel.nom_produit }}</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{{ url_for('materiel_detail', id=materiel.id) }}" 
+                       class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <i class="fas fa-eye mr-2"></i>
+                        Voir détail
+                    </a>
+                    <a href="{{ url_for('materiel_list') }}" 
+                       class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Retour à la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST" class="px-6 py-6 space-y-6" x-data="materielForm()">
+            <!-- Basic Information -->
+            <div class="grid grid-cols-1 gap-6">
+                <div>
+                    <label for="nom_produit" class="block text-sm font-medium text-gray-700 mb-1">
+                        Nom du produit <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" 
+                           name="nom_produit" 
+                           id="nom_produit" 
+                           required
+                           value="{{ materiel.nom_produit }}"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300"
+                           placeholder="Nom du produit/matériel">
+                </div>
+
+                <div>
+                    <label for="fournisseur" class="block text-sm font-medium text-gray-700 mb-1">
+                        Fournisseur
+                    </label>
+                    <input type="text" 
+                           name="fournisseur" 
+                           id="fournisseur"
+                           value="{{ materiel.fournisseur or '' }}"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300"
+                           placeholder="Nom du fournisseur">
+                </div>
+            </div>
+
+            <!-- Quantities and Pricing -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Quantités et prix</h4>
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div>
+                        <label for="quantite" class="block text-sm font-medium text-gray-700 mb-1">
+                            Quantité
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-cubes text-gray-400"></i>
+                            </div>
+                            <input type="number" 
+                                   name="quantite" 
+                                   id="quantite"
+                                   min="1"
+                                   value="{{ materiel.quantite or '' }}"
+                                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 pl-10"
+                                   placeholder="0"
+                                   x-on:input="calculateAmounts()">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="prix_unit" class="block text-sm font-medium text-gray-700 mb-1">
+                            Prix unitaire (FCFA)
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-coins text-gray-400"></i>
+                            </div>
+                            <input type="number" 
+                                   name="prix_unit" 
+                                   id="prix_unit"
+                                   step="0.01"
+                                   min="0"
+                                   value="{{ materiel.prix_unit or '' }}"
+                                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 pl-10"
+                                   placeholder="0.00"
+                                   x-on:input="calculateAmounts()">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="montant_ht" class="block text-sm font-medium text-gray-700 mb-1">
+                            Montant HT (FCFA)
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-calculator text-gray-400"></i>
+                            </div>
+                            <input type="number" 
+                                   name="montant_ht" 
+                                   id="montant_ht"
+                                   step="0.01"
+                                   min="0"
+                                   value="{{ materiel.montant_ht or '' }}"
+                                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 pl-10"
+                                   placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="tva" class="block text-sm font-medium text-gray-700 mb-1">
+                            TVA (%)
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-400 text-sm">%</span>
+                            </div>
+                            <input type="number" 
+                                   name="tva" 
+                                   id="tva"
+                                   step="0.01"
+                                   min="0"
+                                   max="100"
+                                   value="{{ materiel.tva or 18 }}"
+                                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 pl-10"
+                                   placeholder="18"
+                                   x-on:input="calculateAmounts()">
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label for="montant_ttc" class="block text-sm font-medium text-gray-700 mb-1">
+                            Montant TTC (FCFA)
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-money-bill-wave text-gray-400"></i>
+                            </div>
+                            <input type="number" 
+                                   name="montant_ttc" 
+                                   id="montant_ttc"
+                                   step="0.01"
+                                   min="0"
+                                   value="{{ materiel.montant_ttc or '' }}"
+                                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 pl-10 font-medium"
+                                   placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dates -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Dates importantes</h4>
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <label for="date_sortie" class="block text-sm font-medium text-gray-700 mb-1">
+                            Date de sortie
+                        </label>
+                        <input type="date" 
+                               name="date_sortie" 
+                               id="date_sortie"
+                               value="{{ materiel.date_sortie.strftime('%Y-%m-%d') if materiel.date_sortie else '' }}"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300">
+                        <p class="mt-1 text-sm text-gray-500">Date de commande ou de sortie du stock</p>
+                    </div>
+                    <div>
+                        <label for="date_reception" class="block text-sm font-medium text-gray-700 mb-1">
+                            Date de réception
+                        </label>
+                        <input type="date" 
+                               name="date_reception" 
+                               id="date_reception"
+                               value="{{ materiel.date_reception.strftime('%Y-%m-%d') if materiel.date_reception else '' }}"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300">
+                        <p class="mt-1 text-sm text-gray-500">Date de réception du matériel</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Observations -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Informations complémentaires</h4>
+                <div>
+                    <label for="observations" class="block text-sm font-medium text-gray-700 mb-1">
+                        Observations
+                    </label>
+                    <textarea name="observations" 
+                              id="observations" 
+                              rows="4"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300"
+                              placeholder="Notes, remarques ou observations sur ce matériel...">{{ materiel.observations or '' }}</textarea>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-6">
+                <button type="submit" 
+                        class="w-full inline-flex justify-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">
+                    <i class="fas fa-save mr-2"></i>
+                    Enregistrer les modifications
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function materielForm() {
+        return {
+            loading: false,
+            calculateAmounts() {
+                const quantite = parseFloat(document.getElementById('quantite').value) || 0;
+                const prixUnit = parseFloat(document.getElementById('prix_unit').value) || 0;
+                const tva = parseFloat(document.getElementById('tva').value) || 0;
+                
+                if (quantite > 0 && prixUnit > 0) {
+                    const montantHT = quantite * prixUnit;
+                    const montantTTC = montantHT + (montantHT * tva / 100);
+                    
+                    document.getElementById('montant_ht').value = montantHT.toFixed(2);
+                    document.getElementById('montant_ttc').value = montantTTC.toFixed(2);
+                }
+            },
+            validateDates() {
+                const dateSortie = document.getElementById('date_sortie').value;
+                const dateReception = document.getElementById('date_reception').value;
+                
+                if (dateSortie && dateReception && dateSortie > dateReception) {
+                    alert('La date de sortie ne peut pas être postérieure à la date de réception.');
+                    return false;
+                }
+                return true;
+            },
+            submitForm(event) {
+                if (!this.validateDates()) {
+                    event.preventDefault();
+                    return;
+                }
+                this.loading = true;
+            }
+        };
+    }
+</script>
+{% endblock %}

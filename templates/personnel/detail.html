@@ -1,0 +1,453 @@
+{% extends "base.html" %}
+
+{% block title %}{{ personnel.prenom }} {{ personnel.nom }} - Système de Gestion{% endblock %}
+{% block page_title %}Détails du Personnel{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+        <div class="px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                        <span class="text-white text-xl font-bold">
+                            {{ personnel.prenom[0] if personnel.prenom else 'U' }}{{ personnel.nom[0] if personnel.nom else 'U' }}
+                        </span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">{{ personnel.prenom }} {{ personnel.nom }}</h1>
+                        <div class="flex items-center space-x-4 mt-2">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                {% if personnel.departement == 'Trading' %}bg-blue-100 text-blue-800
+                                {% elif personnel.departement == 'Academy' %}bg-green-100 text-green-800
+                                {% elif personnel.departement == 'Digital' %}bg-purple-100 text-purple-800
+                                {% elif personnel.departement == 'Direction' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ personnel.departement }}
+                            </span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                {% if personnel.convention == 'CDI' %}bg-green-100 text-green-800
+                                {% elif personnel.convention == 'CDD' %}bg-yellow-100 text-yellow-800
+                                {% elif personnel.convention == 'Stage' %}bg-blue-100 text-blue-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ personnel.convention }}
+                            </span>
+                            {% if personnel.date_depart %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                <i class="fas fa-circle mr-1 text-xs"></i>
+                                Inactif
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <i class="fas fa-circle mr-1 text-xs"></i>
+                                Actif
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{{ url_for('personnel_list') }}" 
+                       class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Retour à la liste
+                    </a>
+                    {% if session.role == 'Administrator' %}
+                    <a href="{{ url_for('personnel_edit', id=personnel.id) }}" 
+                       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <i class="fas fa-edit mr-2"></i>
+                        Modifier
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left column - Personal info -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Personal Information -->
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-user mr-2 text-blue-500"></i>
+                        Informations personnelles
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <dl class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Nom complet</dt>
+                            <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ personnel.prenom }} {{ personnel.nom }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Email</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                <a href="mailto:{{ personnel.email }}" class="text-blue-600 hover:text-blue-800 flex items-center">
+                                    <i class="fas fa-envelope mr-2"></i>
+                                    {{ personnel.email }}
+                                </a>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Téléphone</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                {% if personnel.phone %}
+                                <a href="tel:{{ personnel.phone }}" class="text-blue-600 hover:text-blue-800 flex items-center">
+                                    <i class="fas fa-phone mr-2"></i>
+                                    {{ personnel.phone }}
+                                </a>
+                                {% else %}
+                                <span class="text-gray-400 italic">Non renseigné</span>
+                                {% endif %}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">École/Formation</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                {% if personnel.ecole %}
+                                    {{ personnel.ecole }}
+                                {% else %}
+                                    <span class="text-gray-400 italic">Non renseigné</span>
+                                {% endif %}
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Professional Information -->
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-briefcase mr-2 text-purple-500"></i>
+                        Informations professionnelles
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <dl class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Département</dt>
+                            <dd class="mt-1">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                    {% if personnel.departement == 'Trading' %}bg-blue-100 text-blue-800
+                                    {% elif personnel.departement == 'Academy' %}bg-green-100 text-green-800
+                                    {% elif personnel.departement == 'Digital' %}bg-purple-100 text-purple-800
+                                    {% elif personnel.departement == 'Direction' %}bg-yellow-100 text-yellow-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    <i class="fas 
+                                        {% if personnel.departement == 'Trading' %}fa-chart-line
+                                        {% elif personnel.departement == 'Academy' %}fa-graduation-cap
+                                        {% elif personnel.departement == 'Digital' %}fa-laptop-code
+                                        {% elif personnel.departement == 'Direction' %}fa-crown
+                                        {% else %}fa-building{% endif %} mr-2"></i>
+                                    {{ personnel.departement }}
+                                </span>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Type de convention</dt>
+                            <dd class="mt-1">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                    {% if personnel.convention == 'CDI' %}bg-green-100 text-green-800
+                                    {% elif personnel.convention == 'CDD' %}bg-yellow-100 text-yellow-800
+                                    {% elif personnel.convention == 'Stage' %}bg-blue-100 text-blue-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ personnel.convention }}
+                                </span>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Rôle système</dt>
+                            <dd class="mt-1">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                    {% if personnel.role == 'Administrator' %}bg-red-100 text-red-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {% if personnel.role == 'Administrator' %}
+                                        <i class="fas fa-shield-alt mr-2"></i>
+                                    {% endif %}
+                                    {{ personnel.role }}
+                                </span>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Nom d'utilisateur</dt>
+                            <dd class="mt-1 text-sm text-gray-900 font-mono bg-gray-50 px-2 py-1 rounded">
+                                {{ personnel.username }}
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Dates importantes -->
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-calendar mr-2 text-green-500"></i>
+                        Dates importantes
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <dl class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Date d'arrivée</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                {% if personnel.date_arrivee %}
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar-plus mr-2 text-green-500"></i>
+                                        {{ personnel.date_arrivee.strftime('%d/%m/%Y') }}
+                                        <span class="ml-2 text-xs text-gray-500">
+                                            ({{ (datetime.now().date() - personnel.date_arrivee).days }} jours)
+                                        </span>
+                                    </div>
+                                {% else %}
+                                    <span class="text-gray-400 italic">Non renseigné</span>
+                                {% endif %}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Date de départ</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                {% if personnel.date_depart %}
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar-minus mr-2 text-red-500"></i>
+                                        {{ personnel.date_depart.strftime('%d/%m/%Y') }}
+                                    </div>
+                                {% else %}
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check-circle mr-2 text-green-500"></i>
+                                        <span class="text-green-600 font-medium">Toujours en poste</span>
+                                    </div>
+                                {% endif %}
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Observations -->
+            {% if personnel.observations %}
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-sticky-note mr-2 text-yellow-500"></i>
+                        Observations
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <p class="text-sm text-gray-700">{{ personnel.observations }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right column - Stats and quick actions -->
+        <div class="space-y-6">
+            <!-- Quick actions -->
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-bolt mr-2 text-yellow-500"></i>
+                        Actions rapides
+                    </h3>
+                </div>
+                <div class="p-6 space-y-3">
+                    <a href="mailto:{{ personnel.email }}" 
+                       class="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-envelope mr-2"></i>
+                        Envoyer un email
+                    </a>
+                    {% if personnel.phone %}
+                    <a href="tel:{{ personnel.phone }}" 
+                       class="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-phone mr-2"></i>
+                        Appeler
+                    </a>
+                    {% endif %}
+                    {% if session.role == 'Administrator' %}
+                    <div class="border-t border-gray-200 pt-3 mt-3">
+                        <a href="{{ url_for('personnel_edit', id=personnel.id) }}" 
+                           class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-edit mr-2"></i>
+                            Modifier le profil
+                        </a>
+                        <button @click="deletePersonnel({{ personnel.id }}, '{{ personnel.prenom }} {{ personnel.nom }}')"
+                                class="w-full mt-2 inline-flex items-center justify-center px-4 py-2 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            <i class="fas fa-trash mr-2"></i>
+                            Supprimer
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-chart-bar mr-2 text-blue-500"></i>
+                        Statistiques
+                    </h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    <!-- Trading stats -->
+                    {% if personnel.departement == 'Trading' or session.role == 'Administrator' %}
+                    <div class="bg-blue-50 rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-blue-900">Transactions Trading</p>
+                                <p class="text-2xl font-bold text-blue-700">{{ personnel.tradings|length }}</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-chart-line text-blue-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Academy stats -->
+                    {% if personnel.departement == 'Academy' or session.role == 'Administrator' %}
+                    <div class="bg-green-50 rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-green-900">Formations Academy</p>
+                                <p class="text-2xl font-bold text-green-700">{{ personnel.academys|length }}</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-graduation-cap text-green-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Digital stats -->
+                    {% if personnel.departement == 'Digital' or session.role == 'Administrator' %}
+                    <div class="bg-purple-50 rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-purple-900">Projets Digital</p>
+                                <p class="text-2xl font-bold text-purple-700">{{ personnel.digitals|length }}</p>
+                            </div>
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-laptop-code text-purple-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Ancienneté -->
+                    {% if personnel.date_arrivee %}
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">Ancienneté</p>
+                                <p class="text-2xl font-bold text-gray-700">
+                                    {% set days = (datetime.now().date() - personnel.date_arrivee).days %}
+                                    {% if days < 30 %}
+                                        {{ days }} jours
+                                    {% elif days < 365 %}
+                                        {{ (days / 30)|round|int }} mois
+                                    {% else %}
+                                        {{ (days / 365)|round(1) }} ans
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-calendar-check text-gray-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Recent activity (placeholder) -->
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-clock mr-2 text-orange-500"></i>
+                        Activité récente
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="text-center py-8">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-history text-gray-400 text-xl"></i>
+                        </div>
+                        <p class="text-sm text-gray-500">Aucune activité récente</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete confirmation modal -->
+<div x-data="{ show: false, personnelId: null, personnelName: '' }" 
+     x-show="show" 
+     x-on:delete-personnel.window="show = true; personnelId = $event.detail.id; personnelName = $event.detail.name"
+     class="fixed inset-0 z-50 overflow-y-auto" 
+     style="display: none;">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div x-show="show" 
+             x-transition:enter="ease-out duration-300" 
+             x-transition:enter-start="opacity-0" 
+             x-transition:enter-end="opacity-100"
+             class="fixed inset-0 transition-opacity" 
+             @click="show = false">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+
+        <div x-show="show" 
+             x-transition:enter="ease-out duration-300" 
+             x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+             x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+             class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <i class="fas fa-exclamation-triangle text-red-600"></i>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Confirmer la suppression</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">
+                                Êtes-vous sûr de vouloir supprimer <strong x-text="personnelName"></strong> ? Cette action est irréversible et supprimera également toutes les données associées.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <form :action="'/personnel/' + personnelId + '/delete'" method="POST" class="inline">
+                    <button type="submit" 
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Supprimer définitivement
+                    </button>
+                </form>
+                <button @click="show = false" 
+                        type="button" 
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Annuler
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function deletePersonnel(id, name) {
+        window.dispatchEvent(new CustomEvent('delete-personnel', {
+            detail: { id: id, name: name }
+        }));
+    }
+</script>
+{% endblock %}

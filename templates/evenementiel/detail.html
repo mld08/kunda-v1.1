@@ -1,0 +1,450 @@
+{% extends "base.html" %}
+
+{% block title %}{{ evenementiel.nom }} - KUNDA{% endblock %}
+{% block page_title %}Détails de l'événement{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+        <div class="px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-project-diagram text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">{{ evenementiel.nom }}</h1>
+                        <div class="flex items-center space-x-4 mt-2">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                {% if evenementiel.departement == 'Trading' %}bg-blue-100 text-blue-800
+                                {% elif evenementiel.departement == 'Academy' %}bg-green-100 text-green-800
+                                {% elif evenementiel.departement == 'Digital' %}bg-purple-100 text-purple-800
+                                {% elif evenementiel.departement == 'Direction' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                <i class="fas 
+                                    {% if evenementiel.departement == 'Trading' %}fa-chart-line
+                                    {% elif evenementiel.departement == 'Academy' %}fa-graduation-cap
+                                    {% elif evenementiel.departement == 'Digital' %}fa-laptop-code
+                                    {% elif evenementiel.departement == 'Direction' %}fa-crown
+                                    {% else %}fa-building{% endif %} mr-1"></i>
+                                {{ evenementiel.departement }}
+                            </span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                {% if evenementiel.statut == 'En cours' %}bg-blue-100 text-blue-800
+                                {% elif evenementiel.statut == 'Terminé' %}bg-green-100 text-green-800
+                                {% elif evenementiel.statut == 'En attente' %}bg-yellow-100 text-yellow-800
+                                {% elif evenementiel.statut == 'Annulé' %}bg-red-100 text-red-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                <i class="fas 
+                                    {% if evenementiel.statut == 'En cours' %}fa-play
+                                    {% elif evenementiel.statut == 'Terminé' %}fa-check
+                                    {% elif evenementiel.statut == 'En attente' %}fa-pause
+                                    {% elif evenementiel.statut == 'Annulé' %}fa-times
+                                    {% else %}fa-circle{% endif %} mr-1 text-xs"></i>
+                                {{ evenementiel.statut }}
+                            </span>
+                            {% if evenementiel.budget %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                <i class="fas fa-coins mr-1"></i>
+                                {{ "{:,.0f}".format(evenementiel.budget) }} FCFA
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{{ url_for('evenementiel_list') }}" 
+                       class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Retour à la liste
+                    </a>
+                    {% if session.role == 'Administrator' %}
+                    <a href="{{ url_for('evenementiel_edit', id=evenementiel.id) }}" 
+                       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <i class="fas fa-edit mr-2"></i>
+                        Modifier
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left column - Project info -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Project Description -->
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                        Description de l'événement
+                    </h3>
+                </div>
+                <div class="p-6">
+                    {% if evenementiel.description %}
+                    <div class="prose max-w-none text-gray-700">
+                        {{ evenementiel.description|replace('\n', '<br>')|safe }}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-8">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-file-text text-gray-400 text-xl"></i>
+                        </div>
+                        <p class="text-sm text-gray-500">Aucune description disponible</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Project Information -->
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-cogs mr-2 text-purple-500"></i>
+                        Informations de l'événement
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Nom de l'événement</dt>
+                            <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ evenementiel.nom }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Département responsable</dt>
+                            <dd class="mt-1">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                    {% if evenementiel.departement == 'Trading' %}bg-blue-100 text-blue-800
+                                    {% elif evenementiel.departement == 'Academy' %}bg-green-100 text-green-800
+                                    {% elif evenementiel.departement == 'Digital' %}bg-purple-100 text-purple-800
+                                    {% elif evenementiel.departement == 'Direction' %}bg-yellow-100 text-yellow-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    <i class="fas 
+                                        {% if evenementiel.departement == 'Trading' %}fa-chart-line
+                                        {% elif evenementiel.departement == 'Academy' %}fa-graduation-cap
+                                        {% elif evenementiel.departement == 'Digital' %}fa-laptop-code
+                                        {% elif evenementiel.departement == 'Direction' %}fa-crown
+                                        {% else %}fa-building{% endif %} mr-2"></i>
+                                    {{ evenementiel.departement }}
+                                </span>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Statut actuel</dt>
+                            <dd class="mt-1">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                    {% if evenementiel.statut == 'En cours' %}bg-blue-100 text-blue-800
+                                    {% elif evenementiel.statut == 'Terminé' %}bg-green-100 text-green-800
+                                    {% elif evenementiel.statut == 'En attente' %}bg-yellow-100 text-yellow-800
+                                    {% elif evenementiel.statut == 'Annulé' %}bg-red-100 text-red-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    <i class="fas 
+                                        {% if evenementiel.statut == 'En cours' %}fa-play
+                                        {% elif evenementiel.statut == 'Terminé' %}fa-check
+                                        {% elif evenementiel.statut == 'En attente' %}fa-pause
+                                        {% elif evenementiel.statut == 'Annulé' %}fa-times
+                                        {% else %}fa-circle{% endif %} mr-2"></i>
+                                    {{ evenementiel.statut }}
+                                </span>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Budget alloué</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                {% if evenementiel.budget %}
+                                    <div class="flex items-center">
+                                        <i class="fas fa-coins mr-2 text-yellow-500"></i>
+                                        <span class="font-semibold">{{ "{:,.0f}".format(evenementiel.budget) }} FCFA</span>
+                                    </div>
+                                {% else %}
+                                    <span class="text-gray-400 italic">Budget non défini</span>
+                                {% endif %}
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-calendar-alt mr-2 text-green-500"></i>
+                        Planning de l'événement
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="flow-root">
+                        <ul class="-mb-8">
+                            <li class="relative pb-8">
+                                <div class="relative flex items-start space-x-3">
+                                    <div class="relative">
+                                        <div class="h-10 w-10 rounded-full bg-green-500 flex items-center justify-center">
+                                            <i class="fas fa-play text-white text-sm"></i>
+                                        </div>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            Date de début
+                                        </div>
+                                        <div class="mt-1 text-sm text-gray-600">
+                                            {% if evenementiel.date_debut %}
+                                                <span class="font-medium">{{ evenementiel.date_debut.strftime('%d/%m/%Y') }}</span>
+                                                <span class="text-gray-400 ml-2">
+                                                    ({{ (datetime.now().date() - evenementiel.date_debut).days }} jours écoulés)
+                                                </span>
+                                            {% else %}
+                                                <span class="text-red-500">Date non définie</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            
+                            {% if evenementiel.date_fin %}
+                            <li class="relative pb-8">
+                                <div class="relative flex items-start space-x-3">
+                                    <div class="relative">
+                                        <div class="h-10 w-10 rounded-full {% if evenementiel.statut == 'Terminé' %}bg-blue-500{% else %}bg-gray-400{% endif %} flex items-center justify-center">
+                                            <i class="fas {% if evenementiel.statut == 'Terminé' %}fa-check{% else %}fa-flag{% endif %} text-white text-sm"></i>
+                                        </div>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            Date de fin{% if evenementiel.statut != 'Terminé' %} prévue{% endif %}
+                                        </div>
+                                        <div class="mt-1 text-sm text-gray-600">
+                                            <span class="font-medium">{{ evenementiel.date_fin.strftime('%d/%m/%Y') }}</span>
+                                            {% if evenementiel.date_fin > datetime.now().date() and evenementiel.statut != 'Terminé' %}
+                                                <span class="text-blue-500 ml-2">
+                                                    ({{ (evenementiel.date_fin - datetime.now().date()).days }} jours restants)
+                                                </span>
+                                            {% elif evenementiel.date_fin < datetime.now().date() and evenementiel.statut != 'Terminé' %}
+                                                <span class="text-red-500 ml-2">
+                                                    ({{ (datetime.now().date() - evenementiel.date_fin).days }} jours de retard)
+                                                </span>
+                                            {% elif evenementiel.statut == 'Terminé' %}
+                                                <span class="text-green-500 ml-2">
+                                                    (Evenement terminé)
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            {% else %}
+                            <li class="relative">
+                                <div class="relative flex items-start space-x-3">
+                                    <div class="relative">
+                                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                            <i class="fas fa-question text-white text-sm"></i>
+                                        </div>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            Date de fin
+                                        </div>
+                                        <div class="mt-1 text-sm text-gray-500 italic">
+                                            Date de fin non définie
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right column - Stats and quick actions -->
+        <div class="space-y-6">
+            <!-- Quick actions -->
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-bolt mr-2 text-yellow-500"></i>
+                        Actions rapides
+                    </h3>
+                </div>
+                <div class="p-6 space-y-3">
+                    {% if session.role == 'Administrator' %}
+                    <a href="{{ url_for('evenementiel_edit', id=evenementiel.id) }}" 
+                       class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <i class="fas fa-edit mr-2"></i>
+                        Modifier l'événement
+                    </a>
+                    
+                    <div class="border-t border-gray-200 pt-3 mt-3">
+                        <button @click="deleteEvenement({{ evenementiel.id }}, '{{ evenementiel.nom }}')"
+                                class="w-full inline-flex items-center justify-center px-4 py-2 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            <i class="fas fa-trash mr-2"></i>
+                            Supprimer l'événement
+                        </button>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <p class="text-sm text-gray-500">Actions limitées pour ce rôle</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Project Stats -->
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-chart-pie mr-2 text-blue-500"></i>
+                        Statistiques
+                    </h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    <!-- Durée de l'événement -->
+                    {% if evenementiel.date_debut %}
+                    <div class="bg-blue-50 rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-blue-900">Durée de l'événement </p>
+                                <p class="text-2xl font-bold text-blue-700">
+                                    {% if evenementiel.date_fin %}
+                                        {{ (evenementiel.date_fin - evenementiel.date_debut).days }} jours
+                                    {% else %}
+                                        {{ (datetime.now().date() - evenementiel.date_debut).days }} jours
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-clock text-blue-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Progress -->
+                    {% if evenementiel.date_debut and evenementiel.date_fin %}
+                    <div class="bg-green-50 rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-green-900">Progression</p>
+                                {% set total_days = (evenementiel.date_fin - evenementiel.date_debut).days %}
+                                {% set elapsed_days = (datetime.now().date() - evenementiel.date_debut).days %}
+                                {% set progress = ((elapsed_days / total_days) * 100) if total_days > 0 else 0 %}
+                                {% set progress = 100 if progress > 100 else progress %}
+                                {% set progress = 0 if progress < 0 else progress %}
+                                <p class="text-2xl font-bold text-green-700">{{ "%.0f"|format(progress) }}%</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-percentage text-green-600 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 bg-green-200 rounded-full h-2">
+                            <div class="bg-green-600 h-2 rounded-full transition-all duration-300" style="width: {{ progress }}%"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Budget status -->
+                    {% if evenementiel.budget %}
+                    <div class="bg-yellow-50 rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-yellow-900">Budget alloué</p>
+                                <p class="text-2xl font-bold text-yellow-700">{{ "{:,.0f}".format(evenementiel.budget) }}</p>
+                                <p class="text-xs text-yellow-600">FCFA</p>
+                            </div>
+                            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-coins text-yellow-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Project Team (placeholder) -->
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-users mr-2 text-purple-500"></i>
+                        Équipe evenement
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="text-center py-8">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-user-plus text-gray-400 text-xl"></i>
+                        </div>
+                        <p class="text-sm text-gray-500">Aucun membre d'équipe assigné</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete confirmation modal -->
+<div x-data="{ show: false, evenementielId: null, evenementielName: '' }" 
+     x-show="show" 
+     x-on:delete-evenement.window="show = true; evenementielId = $event.detail.id; evenementielName = $event.detail.name"
+     class="fixed inset-0 z-50 overflow-y-auto" 
+     style="display: none;">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div x-show="show" 
+             x-transition:enter="ease-out duration-300" 
+             x-transition:enter-start="opacity-0" 
+             x-transition:enter-end="opacity-100"
+             class="fixed inset-0 transition-opacity" 
+             @click="show = false">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+
+        <div x-show="show" 
+             x-transition:enter="ease-out duration-300" 
+             x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+             x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+             class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <i class="fas fa-exclamation-triangle text-red-600"></i>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Confirmer la suppression</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">
+                                Êtes-vous sûr de vouloir supprimer l'événement <strong x-text="evenementielName"></strong> ? Cette action est irréversible et supprimera également toutes les données associées.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <form :action="'/evenementiel/' + evenementielId + '/delete'" method="POST" class="inline">
+                    <button type="submit" 
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Supprimer définitivement
+                    </button>
+                </form>
+                <button @click="show = false" 
+                        type="button" 
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Annuler
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function deleteEvenement(id, name) {
+        window.dispatchEvent(new CustomEvent('delete-evenement', {
+            detail: { id: id, name: name }
+        }));
+    }
+</script>
+{% endblock %}

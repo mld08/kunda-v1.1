@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+
+{% block title %}Événementiels - KUNDA{% endblock %}
+{% block page_title %}Gestion des Événementiels{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header with search and filters -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+            <!-- Search -->
+            <div class="flex-1 max-w-lg">
+                <form method="GET" class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <input type="text" 
+                           name="search" 
+                           value="{{ search }}"
+                           class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="Rechercher par nom, description...">
+                    <input type="hidden" name="departement" value="{{ departement }}">
+                </form>
+            </div>
+
+            <!-- Filters and Actions -->
+            <div class="flex items-center space-x-4">
+                <!-- Department filter -->
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" 
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-filter mr-2"></i>
+                        {% if departement %}{{ departement }}{% else %}Tous les départements{% endif %}
+                        <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                    </button>
+                    <div x-show="open" @click.away="open = false" 
+                         x-transition:enter="transition ease-out duration-100" 
+                         x-transition:enter-start="transform opacity-0 scale-95" 
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         class="absolute right-0 z-10 mt-2 w-56 origin-top-right bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                        <div class="py-1">
+                            <a href="?search={{ search }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Tous les départements</a>
+                            <a href="?search={{ search }}&departement=Direction" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Direction</a>
+                            <a href="?search={{ search }}&departement=Trading" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Trading</a>
+                            <a href="?search={{ search }}&departement=Academy" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Academy</a>
+                            <a href="?search={{ search }}&departement=Digital" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Digital</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add button -->
+                <a href="{{ url_for('evenementiel_create') }}" 
+                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200 transform hover:scale-105">
+                    <i class="fas fa-plus mr-2"></i>
+                    Nouvel Événement
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Events table -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        {% if evenementiels.items %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Événement</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Département</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Budget</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Période</th>
+                        <th scope="col" class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for evenementiel in evenementiels.items %}
+                    <tr class="hover:bg-gray-50 transition-colors duration-200">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-calendar-star text-white text-sm"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">
+                                        {{ evenementiel.nom }}
+                                    </div>
+                                    <div class="text-sm text-gray-500">
+                                        {{ evenementiel.description[:25] }}{% if evenementiel.description and evenementiel.description|length > 25 %}...{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                {% if evenementiel.departement == 'Trading' %}bg-blue-100 text-blue-800
+                                {% elif evenementiel.departement == 'Academy' %}bg-green-100 text-green-800
+                                {% elif evenementiel.departement == 'Digital' %}bg-purple-100 text-purple-800
+                                {% elif evenementiel.departement == 'Direction' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ evenementiel.departement }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                {% if evenementiel.statut == 'En cours' %}bg-blue-100 text-blue-800
+                                {% elif evenementiel.statut == 'Terminé' %}bg-green-100 text-green-800
+                                {% elif evenementiel.statut == 'En attente' %}bg-yellow-100 text-yellow-800
+                                {% elif evenementiel.statut == 'Annulé' %}bg-red-100 text-red-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                <i class="fas 
+                                    {% if evenementiel.statut == 'En cours' %}fa-play
+                                    {% elif evenementiel.statut == 'Terminé' %}fa-check
+                                    {% elif evenementiel.statut == 'En attente' %}fa-pause
+                                    {% elif evenementiel.statut == 'Annulé' %}fa-times
+                                    {% else %}fa-circle{% endif %} mr-1 text-xs"></i>
+                                {{ evenementiel.statut }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {% if evenementiel.budget %}
+                                {{ "{:,.0f}".format(evenementiel.budget) }} FCFA
+                            {% else %}
+                                <span class="text-gray-400">Non défini</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <div class="flex flex-col">
+                                <span class="text-xs text-gray-400">Début:</span>
+                                <span>{{ evenementiel.date_debut.strftime('%d/%m/%Y') if evenementiel.date_debut else 'N/A' }}</span>
+                                {% if evenementiel.date_fin %}
+                                <span class="text-xs text-gray-400 mt-1">Fin:</span>
+                                <span>{{ evenementiel.date_fin.strftime('%d/%m/%Y') }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div class="flex items-center justify-end space-x-2">
+                                <!-- View -->
+                                <a href="{{ url_for('evenementiel_detail', id=evenementiel.id) }}" 
+                                   class="text-blue-600 hover:text-blue-900 transition-colors duration-200">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                
+                                <!-- Edit -->
+                                
+                                <a href="{{ url_for('evenementiel_edit', id=evenementiel.id) }}" 
+                                   class="text-green-600 hover:text-green-900 transition-colors duration-200">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                
+                                {% if session.role == 'Administrator' %}
+                                <!-- Delete -->
+                                <button @click="deleteEvenementiel({{ evenementiel.id }}, '{{ evenementiel.nom }}')" 
+                                        class="text-red-600 hover:text-red-900 transition-colors duration-200">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if evenementiels.pages > 1 %}
+        <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+            <div class="flex items-center justify-between">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    {% if evenementiels.has_prev %}
+                    <a href="{{ url_for('evenementiel_list', page=evenementiels.prev_num, search=search, departement=departement) }}" 
+                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Précédent
+                    </a>
+                    {% endif %}
+                    {% if evenementiels.has_next %}
+                    <a href="{{ url_for('evenementiel_list', page=evenementiels.next_num, search=search, departement=departement) }}" 
+                       class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Suivant
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            Affichage de
+                            <span class="font-medium">{{ ((evenementiels.page - 1) * evenementiels.per_page) + 1 }}</span>
+                            à
+                            <span class="font-medium">{{ min(evenementiels.page * evenementiels.per_page, evenementiels.total) }}</span>
+                            sur
+                            <span class="font-medium">{{ evenementiels.total }}</span>
+                            résultats
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                            {% if evenementiels.has_prev %}
+                            <a href="{{ url_for('evenementiel_list', page=evenementiels.prev_num, search=search, departement=departement) }}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                            {% endif %}
+                            
+                            {% for page_num in evenementiels.iter_pages() %}
+                                {% if page_num %}
+                                    {% if page_num != evenementiels.page %}
+                                    <a href="{{ url_for('evenementiel_list', page=page_num, search=search, departement=departement) }}" 
+                                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                        {{ page_num }}
+                                    </a>
+                                    {% else %}
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-purple-50 text-sm font-medium text-purple-600">
+                                        {{ page_num }}
+                                    </span>
+                                    {% endif %}
+                                {% else %}
+                                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                                    ...
+                                </span>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if evenementiels.has_next %}
+                            <a href="{{ url_for('evenementiel_list', page=evenementiels.next_num, search=search, departement=departement) }}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% else %}
+        <!-- Empty state -->
+        <div class="text-center py-12">
+            <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-calendar-star text-gray-400 text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun événement trouvé</h3>
+            <p class="text-gray-500 mb-6">
+                {% if search or departement %}
+                    Aucun résultat ne correspond à vos critères de recherche.
+                {% else %}
+                    Commencez par créer votre premier événement.
+                {% endif %}
+            </p>
+            {% if session.role == 'Administrator' %}
+            <a href="{{ url_for('evenementiel_create') }}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700">
+                <i class="fas fa-plus mr-2"></i>
+                Créer un événement
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete confirmation modal -->
+<div x-data="{ show: false, evenementielId: null, evenementielName: '' }" 
+     x-show="show" 
+     x-on:delete-evenementiel.window="show = true; evenementielId = $event.detail.id; evenementielName = $event.detail.name"
+     class="fixed inset-0 z-50 overflow-y-auto" 
+     style="display: none;">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div x-show="show" 
+             x-transition:enter="ease-out duration-300" 
+             x-transition:enter-start="opacity-0" 
+             x-transition:enter-end="opacity-100"
+             class="fixed inset-0 transition-opacity" 
+             @click="show = false">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+
+        <div x-show="show" 
+             x-transition:enter="ease-out duration-300" 
+             x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+             x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+             class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <i class="fas fa-exclamation-triangle text-red-600"></i>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Confirmer la suppression</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">
+                                Êtes-vous sûr de vouloir supprimer l'événement <strong x-text="evenementielName"></strong> ? Cette action est irréversible.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <form :action="'/evenementiel/' + evenementielId + '/delete'" method="POST" class="inline">
+                    <button type="submit" 
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Supprimer
+                    </button>
+                </form>
+                <button @click="show = false" 
+                        type="button" 
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Annuler
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function deleteEvenementiel(id, name) {
+        window.dispatchEvent(new CustomEvent('delete-evenementiel', {
+            detail: { id: id, name: name }
+        }));
+    }
+
+    // Auto-submit search form on input
+    document.querySelector('input[name="search"]').addEventListener('input', function(e) {
+        clearTimeout(this.searchTimeout);
+        this.searchTimeout = setTimeout(() => {
+            e.target.closest('form').submit();
+        }, 500);
+    });
+</script>
+{% endblock %}

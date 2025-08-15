@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+
+{% block title %}Modifier Academy - Système de Gestion{% endblock %}
+{% block page_title %}Modifier l'Enregistrement Academy{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Modifier les informations Academy</h3>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Modifiez les informations pour {{ academy.nom_client or "le client" }} {{ academy.prenom_client or "" }}
+                    </p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{{ url_for('academy_detail', id=academy.id) }}" 
+                       class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-eye mr-2"></i>
+                        Voir détails
+                    </a>
+                    <a href="{{ url_for('academy_list') }}" 
+                       class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Retour à la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST" class="px-6 py-6 space-y-6" x-data="academyEditForm()">
+            <!-- Basic Information -->
+            <div class="grid grid-cols-1 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label for="date_const" class="block text-sm font-medium text-gray-700 mb-1">
+                            Date <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date" 
+                               name="date_const" 
+                               id="date_const" 
+                               value="{{ academy.date_const.strftime('%Y-%m-%d') if academy.date_const else '' }}"
+                               required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300">
+                    </div>
+
+                    <div>
+                        <label for="type_libelle" class="block text-sm font-medium text-gray-700 mb-1">
+                            Type de service
+                        </label>
+                        <select name="type_libelle" 
+                                id="type_libelle"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300">
+                            <option value="">Sélectionner un type</option>
+                            <option value="Formation" {{ 'selected' if academy.type_libelle == 'Formation' else '' }}>Formation</option>
+                            <option value="Cours particulier" {{ 'selected' if academy.type_libelle == 'Cours particulier' else '' }}>Cours particulier</option>
+                            <option value="Certification" {{ 'selected' if academy.type_libelle == 'Certification' else '' }}>Certification</option>
+                            <option value="Workshop" {{ 'selected' if academy.type_libelle == 'Workshop' else '' }}>Workshop</option>
+                            <option value="Séminaire" {{ 'selected' if academy.type_libelle == 'Séminaire' else '' }}>Séminaire</option>
+                            <option value="Coaching" {{ 'selected' if academy.type_libelle == 'Coaching' else '' }}>Coaching</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Client Information -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Informations Client</h4>
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <label for="nom_client" class="block text-sm font-medium text-gray-700 mb-1">
+                            Nom <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" 
+                               name="nom_client" 
+                               id="nom_client" 
+                               value="{{ academy.nom_client or '' }}"
+                               required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                               placeholder="Nom du client">
+                    </div>
+
+                    <div>
+                        <label for="prenom_client" class="block text-sm font-medium text-gray-700 mb-1">
+                            Prénom <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" 
+                               name="prenom_client" 
+                               id="prenom_client" 
+                               value="{{ academy.prenom_client or '' }}"
+                               required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                               placeholder="Prénom du client">
+                    </div>
+
+                    <div>
+                        <label for="email_client" class="block text-sm font-medium text-gray-700 mb-1">
+                            Email <span class="text-red-500">*</span>
+                        </label>
+                        <input type="email" 
+                               name="email_client" 
+                               id="email_client" 
+                               value="{{ academy.email_client or '' }}"
+                               required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                               placeholder="email@exemple.com">
+                    </div>
+
+                    <div>
+                        <label for="phone_client" class="block text-sm font-medium text-gray-700 mb-1">
+                            Téléphone
+                        </label>
+                        <input type="tel" 
+                               name="phone_client" 
+                               id="phone_client"
+                               value="{{ academy.phone_client or '' }}"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                               placeholder="+221 XX XXX XX XX">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service Details -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Détails du Service</h4>
+                <div class="grid grid-cols-1 gap-6">
+                    <div>
+                        <label for="items" class="block text-sm font-medium text-gray-700 mb-1">
+                            Description des items/services <span class="text-red-500">*</span>
+                        </label>
+                        <textarea name="items" 
+                                  id="items" 
+                                  rows="3"
+                                  required
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                                  placeholder="Décrivez les services ou formations fournis...">{{ academy.items or '' }}</textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label for="quantite" class="block text-sm font-medium text-gray-700 mb-1">
+                                Quantité
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-boxes text-gray-400"></i>
+                                </div>
+                                <input type="number" 
+                                       name="quantite" 
+                                       id="quantite"
+                                       value="{{ academy.quantite or '' }}"
+                                       min="1"
+                                       class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+                                       placeholder="1"
+                                       x-on:input="calculateTotal()">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="prix_unit" class="block text-sm font-medium text-gray-700 mb-1">
+                                Prix unitaire (FCFA)
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-money-bill-wave text-gray-400"></i>
+                                </div>
+                                <input type="number" 
+                                       name="prix_unit" 
+                                       id="prix_unit"
+                                       value="{{ academy.prix_unit or '' }}"
+                                       step="0.01"
+                                       min="0"
+                                       class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+                                       placeholder="0.00"
+                                       x-on:input="calculateTotal()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Details -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Détails financiers</h4>
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div>
+                        <label for="montant_ht" class="block text-sm font-medium text-gray-700 mb-1">
+                            Montant HT (FCFA)
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-calculator text-gray-400"></i>
+                            </div>
+                            <input type="number" 
+                                   name="montant_ht" 
+                                   id="montant_ht"
+                                   value="{{ academy.montant_ht or '' }}"
+                                   step="0.01"
+                                   min="0"
+                                   readonly
+                                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 pl-10 font-medium"
+                                   placeholder="Calculé automatiquement">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="tva" class="block text-sm font-medium text-gray-700 mb-1">
+                            TVA (%)
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-400 text-sm">%</span>
+                            </div>
+                            <input type="number" 
+                                   name="tva" 
+                                   id="tva"
+                                   value="{{ academy.tva or '18' }}"
+                                   step="0.01"
+                                   min="0"
+                                   max="100"
+                                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-10"
+                                   placeholder="18"
+                                   x-on:input="calculateTotal()">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="montant_ttc" class="block text-sm font-medium text-gray-700 mb-1">
+                            Montant TTC (FCFA)
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-money-bill-wave text-gray-400"></i>
+                            </div>
+                            <input type="number" 
+                                   name="montant_ttc" 
+                                   id="montant_ttc"
+                                   value="{{ academy.montant_ttc or '' }}"
+                                   step="0.01"
+                                   min="0"
+                                   readonly
+                                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 pl-10 font-medium"
+                                   placeholder="Calculé automatiquement">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Information -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Informations de paiement</h4>
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <label for="modalite_paiement" class="block text-sm font-medium text-gray-700 mb-1">
+                            Modalité de paiement
+                        </label>
+                        <select name="modalite_paiement" 
+                                id="modalite_paiement"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300">
+                            <option value="">Sélectionner une modalité</option>
+                            <option value="Comptant" {{ 'selected' if academy.modalite_paiement == 'Comptant' else '' }}>Comptant</option>
+                            <option value="30 jours" {{ 'selected' if academy.modalite_paiement == '30 jours' else '' }}>À 30 jours</option>
+                            <option value="60 jours" {{ 'selected' if academy.modalite_paiement == '60 jours' else '' }}>À 60 jours</option>
+                            <option value="90 jours" {{ 'selected' if academy.modalite_paiement == '90 jours' else '' }}>À 90 jours</option>
+                            <option value="Échelonné" {{ 'selected' if academy.modalite_paiement == 'Échelonné' else '' }}>Paiement échelonné</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="type_paiement" class="block text-sm font-medium text-gray-700 mb-1">
+                            Type de paiement
+                        </label>
+                        <select name="type_paiement" 
+                                id="type_paiement"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300">
+                            <option value="Especes" {{ 'selected' if academy.type_paiement == 'Especes' else '' }}>Espèces</option>
+                            <option value="Virement" {{ 'selected' if academy.type_paiement == 'Virement' else '' }}>Virement bancaire</option>
+                            <option value="Cheque" {{ 'selected' if academy.type_paiement == 'Cheque' else '' }}>Chèque</option>
+                            <option value="Carte" {{ 'selected' if academy.type_paiement == 'Carte' else '' }}>Carte bancaire</option>
+                            <option value="Mobile Money" {{ 'selected' if academy.type_paiement == 'Mobile Money' else '' }}>Mobile Money</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Observations -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Informations complémentaires</h4>
+                <div>
+                    <label for="observations" class="block text-sm font-medium text-gray-700 mb-1">
+                        Observations
+                    </label>
+                    <textarea name="observations" 
+                              id="observations" 
+                              rows="4"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                              placeholder="Notes, remarques ou observations sur cet enregistrement Academy...">{{ academy.observations or '' }}</textarea>
+                </div>
+            </div>
+
+            <!-- Summary Card -->
+            <div class="border-t border-gray-200 pt-6">
+                <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border border-blue-200">
+                    <h4 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-chart-line mr-2 text-blue-600"></i>
+                        Résumé des modifications
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600" x-text="quantite || '0'">{{ academy.quantite or '0' }}</div>
+                            <div class="text-sm text-green-700">Quantité</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-purple-600" x-text="formatCurrency(prixUnit)">{{ "{:,.0f}".format(academy.prix_unit) if academy.prix_unit else "0" }} FCFA</div>
+                            <div class="text-sm text-purple-700">Prix unitaire</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-orange-600" x-text="formatCurrency(montantHT)">{{ "{:,.0f}".format(academy.montant_ht) if academy.montant_ht else "0" }} FCFA</div>
+                            <div class="text-sm text-orange-700">Montant HT</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600" x-text="formatCurrency(montantTTC)">{{ "{:,.0f}".format(academy.montant_ttc) if academy.montant_ttc else "0" }} FCFA</div>
+                            <div class="text-sm text-blue-700">Montant TTC</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="pt-6 flex items-center justify-end space-x-4">
+                <a href="{{ url_for('academy_detail', id=academy.id) }}" 
+                   class="inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                    <i class="fas fa-times mr-2"></i>
+                    Annuler
+                </a>
+                <button type="submit" 
+                        class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fas fa-save mr-2"></i>
+                    Enregistrer les modifications
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function academyEditForm() {
+    return {
+        quantite: {{ academy.quantite or 0 }},
+        prixUnit: {{ academy.prix_unit or 0 }},
+        montantHT: {{ academy.montant_ht or 0 }},
+        montantTTC: {{ academy.montant_ttc or 0 }},
+        
+        init() {
+            this.calculateTotal();
+        },
+        
+        calculateTotal() {
+            const quantite = parseFloat(document.getElementById('quantite').value) || 0;
+            const prixUnit = parseFloat(document.getElementById('prix_unit').value) || 0;
+            const tva = parseFloat(document.getElementById('tva').value) || 0;
+            
+            const montantHT = quantite * prixUnit;
+            const montantTTC = montantHT + (montantHT * tva / 100);
+            
+            document.getElementById('montant_ht').value = montantHT.toFixed(2);
+            document.getElementById('montant_ttc').value = montantTTC.toFixed(2);
+            
+            this.quantite = quantite;
+            this.prixUnit = prixUnit;
+            this.montantHT = montantHT;
+            this.montantTTC = montantTTC;
+        },
+        
+        formatCurrency(value) {
+            return new Intl.NumberFormat('fr-FR').format(value || 0) + ' FCFA';
+        }
+    };
+}
+</script>
+{% endblock %}

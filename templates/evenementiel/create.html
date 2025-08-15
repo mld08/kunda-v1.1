@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Créer un Événement - Système de Gestion{% endblock %}
+{% block page_title %}Créer un Nouvel Événement{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Informations de l'événement</h3>
+                    <p class="mt-1 text-sm text-gray-500">Remplissez les informations pour créer un nouvel événement</p>
+                </div>
+                <a href="{{ url_for('evenementiel_list') }}" 
+                   class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Retour
+                </a>
+            </div>
+        </div>
+
+        <form method="POST" class="px-6 py-6 space-y-6" x-data="evenementielForm()">
+            <!-- Event Basic Information -->
+            <div class="grid grid-cols-1 gap-6">
+                <div>
+                    <label for="nom" class="block text-sm font-medium text-gray-700 mb-1">
+                        Nom de l'événement <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" 
+                           name="nom" 
+                           id="nom" 
+                           required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300"
+                           placeholder="Nom de l'événement">
+                </div>
+
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
+                        Description
+                    </label>
+                    <textarea name="description" 
+                              id="description" 
+                              rows="4"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300"
+                              placeholder="Description détaillée de l'événement..."></textarea>
+                </div>
+            </div>
+
+            <!-- Event Details -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Détails de l'événement</h4>
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div>
+                        <label for="departement" class="block text-sm font-medium text-gray-700 mb-1">
+                            Département organisateur <span class="text-red-500">*</span>
+                        </label>
+                        <select name="departement" 
+                                id="departement" 
+                                required
+                                class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300">
+                            <option value="">Sélectionner un département</option>
+                            <option value="Direction">Direction</option>
+                            <option value="Trading">Trading</option>
+                            <option value="Academy">Academy</option>
+                            <option value="Digital">Digital</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="statut" class="block text-sm font-medium text-gray-700 mb-1">
+                            Statut <span class="text-red-500">*</span>
+                        </label>
+                        <select name="statut" 
+                                id="statut" 
+                                required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300">
+                            <option value="">Sélectionner un statut</option>
+                            <option value="En attente">En attente</option>
+                            <option value="En cours">En cours</option>
+                            <option value="Terminé">Terminé</option>
+                            <option value="Annulé">Annulé</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="budget" class="block text-sm font-medium text-gray-700 mb-1">
+                            Budget (FCFA)
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-coins text-gray-400"></i>
+                            </div>
+                            <input type="number" 
+                                   name="budget" 
+                                   id="budget"
+                                   step="1000"
+                                   min="0"
+                                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 pl-10"
+                                   placeholder="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dates -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Planning de l'événement</h4>
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <label for="date_debut" class="block text-sm font-medium text-gray-700 mb-1">
+                            Date de début <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date" 
+                               name="date_debut" 
+                               id="date_debut" 
+                               required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300"> 
+                    </div>
+                    <div>
+                        <label for="date_fin" class="block text-sm font-medium text-gray-700 mb-1">
+                            Date de fin prévue
+                        </label>
+                        <input type="date" 
+                               name="date_fin" 
+                               id="date_fin"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300">
+                        <p class="mt-1 text-sm text-gray-500">Laissez vide si la date de fin n'est pas encore définie</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-6">
+                <button type="submit" 
+                        class="w-full inline-flex justify-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-300">
+                    <i class="fas fa-plus mr-2"></i>
+                    Créer l'événement
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function evenementielForm() {
+        return {
+            loading: false,
+            validateDates() {
+                const dateDebut = document.getElementById('date_debut').value;
+                const dateFin = document.getElementById('date_fin').value;
+                
+                if (dateDebut && dateFin && dateDebut > dateFin) {
+                    alert('La date de début ne peut pas être postérieure à la date de fin.');
+                    return false;
+                }
+                return true;
+            },
+            submitForm(event) {
+                if (!this.validateDates()) {
+                    event.preventDefault();
+                    return;
+                }
+                this.loading = true;
+            }
+        };
+    }
+</script>
+{% endblock %}

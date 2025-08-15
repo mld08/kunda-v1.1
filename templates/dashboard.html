@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - KUNDA{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Stats cards -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- Total Personnel -->
+        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-200">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-users text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total Personnel</dt>
+                            <dd class="flex items-baseline">
+                                <div class="text-2xl font-semibold text-gray-900">{{ total_personnel }}</div>
+                                <div class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+                                    <i class="fas fa-arrow-up text-xs mr-1"></i>
+                                    12%
+                                </div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Personnel Actifs -->
+        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-200">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-user-check text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Personnel Actifs</dt>
+                            <dd class="flex items-baseline">
+                                <div class="text-2xl font-semibold text-gray-900">{{ personnel_actifs }}</div>
+                                <div class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+                                    <i class="fas fa-arrow-up text-xs mr-1"></i>
+                                    8%
+                                </div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Projets -->
+        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-200">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-project-diagram text-purple-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Projets en cours</dt>
+                            <dd class="flex items-baseline">
+                                <div class="text-2xl font-semibold text-gray-900">8</div>
+                                <div class="ml-2 flex items-baseline text-sm font-semibold text-purple-600">
+                                    <i class="fas fa-minus text-xs mr-1"></i>
+                                    0%
+                                </div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenus -->
+        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-200">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-coins text-yellow-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Revenus ce mois</dt>
+                            <dd class="flex items-baseline">
+                                <div class="text-2xl font-semibold text-gray-900">€25,420</div>
+                                <div class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+                                    <i class="fas fa-arrow-up text-xs mr-1"></i>
+                                    23%
+                                </div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Départements chart -->
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Répartition par département</h3>
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <div class="w-3 h-3 bg-purple-500 rounded-full"></div>
+                    <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                </div>
+            </div>
+            <div class="relative">
+                <canvas id="departmentChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Conventions chart -->
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Types de conventions</h3>
+                <button class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-ellipsis-h"></i>
+                </button>
+            </div>
+            <div class="relative">
+                <canvas id="conventionChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent personnel and activity -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Recent personnel -->
+        <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-900">Derniers arrivés</h3>
+                    <a href="{{ url_for('personnel_list') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                        Voir tout
+                        <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="overflow-hidden">
+                <ul class="divide-y divide-gray-200">
+                    {% for person in recent_personnel %}
+                    <li class="px-6 py-4 hover:bg-gray-50 transition-colors duration-200">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-10 h-10 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-sm font-medium">
+                                        {{ person.prenom[0] if person.prenom else 'U' }}{{ person.nom[0] if person.nom else 'U' }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center space-x-3">
+                                    <p class="text-sm font-medium text-gray-900 truncate">
+                                        {{ person.prenom }} {{ person.nom }}
+                                    </p>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                        {% if person.departement == 'Trading' %}bg-blue-100 text-blue-800
+                                        {% elif person.departement == 'Academy' %}bg-green-100 text-green-800
+                                        {% elif person.departement == 'Digital' %}bg-purple-100 text-purple-800
+                                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                        {{ person.departement }}
+                                    </span>
+                                </div>
+                                <div class="flex items-center space-x-4 mt-1">
+                                    <p class="text-sm text-gray-500">{{ person.convention }}</p>
+                                    <p class="text-sm text-gray-500">
+                                        <i class="fas fa-calendar text-xs mr-1"></i>
+                                        {{ person.date_arrivee.strftime('%d/%m/%Y') if person.date_arrivee else 'N/A' }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <a href="{{ url_for('personnel_detail', id=person.id) }}" 
+                                   class="text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Activity feed -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Activité récente</h3>
+            </div>
+            <div class="p-6">
+                <div class="flow-root">
+                    <ul class="-mb-8">
+                        <li class="relative">
+                            <div class="absolute left-0 top-0 flex h-6 w-6 items-center justify-center">
+                                <div class="h-1.5 w-1.5 rounded-full bg-blue-600 ring-1 ring-blue-600"></div>
+                            </div>
+                            <div class="ml-9">
+                                <div class="min-w-0 flex-1">
+                                    <div>
+                                        <div class="text-sm">
+                                            <span class="font-medium text-gray-900">Nouveau personnel</span>
+                                        </div>
+                                        <p class="mt-0.5 text-sm text-gray-500">John Doe ajouté au département Trading</p>
+                                    </div>
+                                    <div class="mt-2 text-sm text-gray-700">
+                                        <time>Il y a 2 heures</time>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="relative mt-6">
+                            <div class="absolute left-0 top-0 flex h-6 w-6 items-center justify-center">
+                                <div class="h-1.5 w-1.5 rounded-full bg-green-600 ring-1 ring-green-600"></div>
+                            </div>
+                            <div class="ml-9">
+                                <div class="min-w-0 flex-1">
+                                    <div>
+                                        <div class="text-sm">
+                                            <span class="font-medium text-gray-900">Projet terminé</span>
+                                        </div>
+                                        <p class="mt-0.5 text-sm text-gray-500">Site web E-commerce livré</p>
+                                    </div>
+                                    <div class="mt-2 text-sm text-gray-700">
+                                        <time>Il y a 1 jour</time>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="relative mt-6">
+                            <div class="absolute left-0 top-0 flex h-6 w-6 items-center justify-center">
+                                <div class="h-1.5 w-1.5 rounded-full bg-yellow-600 ring-1 ring-yellow-600"></div>
+                            </div>
+                            <div class="ml-9">
+                                <div class="min-w-0 flex-1">
+                                    <div>
+                                        <div class="text-sm">
+                                            <span class="font-medium text-gray-900">Formation Academy</span>
+                                        </div>
+                                        <p class="mt-0.5 text-sm text-gray-500">Nouvelle session Python démarrée</p>
+                                    </div>
+                                    <div class="mt-2 text-sm text-gray-700">
+                                        <time>Il y a 3 jours</time>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Chart colors
+    const chartColors = {
+        blue: '#3B82F6',
+        green: '#10B981',
+        purple: '#8B5CF6',
+        yellow: '#F59E0B',
+        red: '#EF4444',
+        gray: '#6B7280'
+    };
+
+    // Département chart
+    const deptCtx = document.getElementById('departmentChart').getContext('2d');
+    const departmentChart = new Chart(deptCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [{% for dept, count in dept_stats %}'{{ dept }}'{{ ',' if not loop.last }}{% endfor %}],
+            datasets: [{
+                data: [{% for dept, count in dept_stats %}{{ count }}{{ ',' if not loop.last }}{% endfor %}],
+                backgroundColor: [chartColors.blue, chartColors.green, chartColors.purple, chartColors.yellow],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                }
+            }
+        }
+    });
+
+    // Convention chart
+    const convCtx = document.getElementById('conventionChart').getContext('2d');
+    const conventionChart = new Chart(convCtx, {
+        type: 'bar',
+        data: {
+            labels: [{% for conv, count in convention_stats %}'{{ conv }}'{{ ',' if not loop.last }}{% endfor %}],
+            datasets: [{
+                label: 'Personnel',
+                data: [{% for conv, count in convention_stats %}{{ count }}{{ ',' if not loop.last }}{% endfor %}],
+                backgroundColor: [chartColors.blue, chartColors.green, chartColors.purple],
+                borderRadius: 6,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

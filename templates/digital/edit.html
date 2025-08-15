@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}Modifier {{ digital.nom_client or "Digital" }} {{ digital.prenom_client or "" }} - KUNDA{% endblock %}
+{% block page_title %}Modifier l'enregistrement Digital{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Modifier Digital</h3>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Modifiez les informations de l'enregistrement Digital de {{ digital.nom_client or "Client" }} {{ digital.prenom_client or "" }}
+                    </p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{{ url_for('digital_detail', id=digital.id) }}" 
+                       class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i class="fas fa-eye mr-2"></i> Voir détails
+                    </a>
+                    <a href="{{ url_for('digital_list') }}" 
+                       class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i class="fas fa-arrow-left mr-2"></i> Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form method="POST" class="px-6 py-6 space-y-6" x-data="digitalEditForm()">
+
+            <!-- Informations de base -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                    <label for="date_const" class="block text-sm font-medium text-gray-700 mb-1">Date <span class="text-red-500">*</span></label>
+                    <input type="date" name="date_const" id="date_const" required
+                           value="{{ digital.date_const.isoformat() if digital.date_const else '' }}"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div>
+                    <label for="type_libelle" class="block text-sm font-medium text-gray-700 mb-1">Type de service</label>
+                    <select name="type_libelle" id="type_libelle"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        <option value="">Sélectionner un type</option>
+                        <option {% if digital.type_libelle == 'Développement web' %}selected{% endif %}>Développement web</option>
+                        <option {% if digital.type_libelle == 'Application mobile' %}selected{% endif %}>Application mobile</option>
+                        <option {% if digital.type_libelle == 'Design graphique' %}selected{% endif %}>Design graphique</option>
+                        <option {% if digital.type_libelle == 'Marketing digital' %}selected{% endif %}>Marketing digital</option>
+                        <option {% if digital.type_libelle == 'SEO/Référencement' %}selected{% endif %}>SEO/Référencement</option>
+                        <option {% if digital.type_libelle == 'E-commerce' %}selected{% endif %}>E-commerce</option>
+                        <option {% if digital.type_libelle == 'Consultation IT' %}selected{% endif %}>Consultation IT</option>
+                        <option {% if digital.type_libelle == 'Maintenance' %}selected{% endif %}>Maintenance</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Informations Client -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Informations Client</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label for="nom_client" class="block text-sm font-medium text-gray-700 mb-1">Nom <span class="text-red-500">*</span></label>
+                        <input type="text" name="nom_client" id="nom_client" required
+                               value="{{ digital.nom_client or '' }}"
+                               placeholder="Nom du client"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div>
+                        <label for="prenom_client" class="block text-sm font-medium text-gray-700 mb-1">Prénom <span class="text-red-500">*</span></label>
+                        <input type="text" name="prenom_client" id="prenom_client" required
+                               value="{{ digital.prenom_client or '' }}"
+                               placeholder="Prénom du client"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div>
+                        <label for="email_client" class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
+                        <input type="email" name="email_client" id="email_client" required
+                               value="{{ digital.email_client or '' }}"
+                               placeholder="email@exemple.com"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div>
+                        <label for="phone_client" class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+                        <input type="tel" name="phone_client" id="phone_client"
+                               value="{{ digital.phone_client or '' }}"
+                               placeholder="+221 XX XXX XX XX"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Détails du Service -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Détails du Service</h4>
+                <div>
+                    <label for="items" class="block text-sm font-medium text-gray-700 mb-1">Description des items/services <span class="text-red-500">*</span></label>
+                    <textarea name="items" id="items" rows="3" required
+                              placeholder="Décrivez les services numériques fournis..."
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">{{ digital.items or '' }}</textarea>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-4">
+                    <div>
+                        <label for="quantite" class="block text-sm font-medium text-gray-700 mb-1">Quantité</label>
+                        <input type="number" name="quantite" id="quantite" min="1" placeholder="1"
+                               value="{{ digital.quantite or '' }}"
+                               x-on:input="calculateTotal()"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div>
+                        <label for="prix_unit" class="block text-sm font-medium text-gray-700 mb-1">Prix unitaire (FCFA)</label>
+                        <input type="number" name="prix_unit" id="prix_unit" step="0.01" min="0" placeholder="0.00"
+                               value="{{ digital.prix_unit or '' }}"
+                               x-on:input="calculateTotal()"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div>
+                        <label for="tva" class="block text-sm font-medium text-gray-700 mb-1">TVA (%)</label>
+                        <input type="number" name="tva" id="tva" step="0.01" min="0" max="100" 
+                               value="{{ digital.tva or 18 }}"
+                               x-on:input="calculateTotal()"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Détails Financiers -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Détails financiers</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label for="montant_ht" class="block text-sm font-medium text-gray-700 mb-1">Montant HT (FCFA)</label>
+                        <input type="number" name="montant_ht" id="montant_ht" step="0.01" min="0" readonly
+                               value="{{ digital.montant_ht or '' }}"
+                               placeholder="Calculé automatiquement"
+                               class="w-full px-4 py-3 border border-gray-300 bg-gray-50 text-gray-600 rounded-lg">
+                    </div>
+                    <div>
+                        <label for="montant_ttc" class="block text-sm font-medium text-gray-700 mb-1">Montant TTC (FCFA)</label>
+                        <input type="number" name="montant_ttc" id="montant_ttc" step="0.01" min="0" readonly
+                               value="{{ digital.montant_ttc or '' }}"
+                               placeholder="Calculé automatiquement"
+                               class="w-full px-4 py-3 border border-gray-300 bg-gray-50 text-gray-600 rounded-lg">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informations de paiement -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Informations de paiement</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label for="modalite_paiement" class="block text-sm font-medium text-gray-700 mb-1">Modalité de paiement</label>
+                        <select name="modalite_paiement" id="modalite_paiement"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <option value="">Sélectionner une modalité</option>
+                            <option {% if digital.modalite_paiement == 'Comptant' %}selected{% endif %}>Comptant</option>
+                            <option {% if digital.modalite_paiement == '30 jours' %}selected{% endif %}>30 jours</option>
+                            <option {% if digital.modalite_paiement == '60 jours' %}selected{% endif %}>60 jours</option>
+                            <option {% if digital.modalite_paiement == '90 jours' %}selected{% endif %}>90 jours</option>
+                            <option {% if digital.modalite_paiement == 'Échelonné' %}selected{% endif %}>Échelonné</option>
+                            <option {% if digital.modalite_paiement == '50% acompte' %}selected{% endif %}>50% acompte</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="type_paiement" class="block text-sm font-medium text-gray-700 mb-1">Type de paiement</label>
+                        <select name="type_paiement" id="type_paiement"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <option {% if digital.type_paiement == 'Espèces' %}selected{% endif %}>Espèces</option>
+                            <option {% if digital.type_paiement == 'Virement bancaire' %}selected{% endif %}>Virement bancaire</option>
+                            <option {% if digital.type_paiement == 'Cheque' %}selected{% endif %}>Cheque</option>
+                            <option {% if digital.type_paiement == 'Paiement mobile' %}selected{% endif %}>Paiement mobile</option>
+                            <option {% if digital.type_paiement == 'Carte bancaire' %}selected{% endif %}>Carte bancaire</option>
+                            <option {% if digital.type_paiement == 'PayPal' %}selected{% endif %}>PayPal</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Observations -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Informations complémentaires</h4>
+                <textarea name="observations" id="observations" rows="4"
+                          placeholder="Notes techniques, spécifications, délais, ou remarques..."
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">{{ digital.observations or '' }}</textarea>
+            </div>
+
+            <!-- Résumé -->
+            <div class="border-t border-gray-200 pt-6">
+                <div class="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-6 border border-purple-200">
+                    <h4 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-laptop-code mr-2 text-purple-600"></i> Résumé Digital
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600" x-text="quantite || '0'">{{ digital.quantite or 0 }}</div>
+                            <div class="text-sm text-green-700">Quantité</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-purple-600" x-text="formatCurrency(prixUnit)">{{ "{:,.0f}".format(digital.prix_unit) if digital.prix_unit else '0' }} FCFA</div>
+                            <div class="text-sm text-purple-700">Prix unitaire</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-orange-600" x-text="formatCurrency(montantHT)">{{ "{:,.0f}".format(digital.montant_ht) if digital.montant_ht else '0' }} FCFA</div>
+                            <div class="text-sm text-orange-700">Montant HT</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-indigo-600" x-text="formatCurrency(montantTTC)">{{ "{:,.0f}".format(digital.montant_ttc) if digital.montant_ttc else '0' }} FCFA</div>
+                            <div class="text-sm text-indigo-700">Montant TTC</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="pt-6">
+                <div class="flex items-center space-x-4">
+                    <button type="submit"
+                            class="flex-1 inline-flex justify-center px-6 py-3 text-white bg-gradient-to-r from-purple-600 to-purple-700 rounded-md hover:from-purple-700 hover:to-purple-800">
+                        <i class="fas fa-save mr-2"></i> Sauvegarder les modifications
+                    </button>
+                    <a href="{{ url_for('digital_detail', id=digital.id) }}"
+                       class="inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Annuler
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function digitalEditForm() {
+    return {
+        quantite: {{ digital.quantite or 0 }},
+        prixUnit: {{ digital.prix_unit or 0 }},
+        montantHT: {{ digital.montant_ht or 0 }},
+        montantTTC: {{ digital.montant_ttc or 0 }},
+        calculateTotal() {
+            const q = parseFloat(document.getElementById('quantite').value) || 0;
+            const pu = parseFloat(document.getElementById('prix_unit').value) || 0;
+            const tva = parseFloat(document.getElementById('tva').value) || 0;
+            const ht = q * pu;
+            const ttc = ht + (ht * tva / 100);
+            document.getElementById('montant_ht').value = ht.toFixed(2);
+            document.getElementById('montant_ttc').value = ttc.toFixed(2);
+            this.quantite = q;
+            this.prixUnit = pu;
+            this.montantHT = ht;
+            this.montantTTC = ttc;
+        },
+        formatCurrency(val) {
+            return new Intl.NumberFormat('fr-FR').format(val) + ' FCFA';
+        }
+    };
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Trigger initial calculation
+    if (document.getElementById('quantite').value && document.getElementById('prix_unit').value) {
+        setTimeout(() => {
+            const event = new Event('input');
+            document.getElementById('quantite').dispatchEvent(event);
+        }, 100);
+    }
+});
+</script>
+{% endblock %}
