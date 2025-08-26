@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block title %}{{ rapport.titre }} - KUNDA{% endblock %}
+{% block page_title %}Détails du Rapport{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-6">
+    <!-- Breadcrumb -->
+    <nav class="flex" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-4">
+            <li>
+                <a href="{{ url_for('rapport_list') }}" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-file-alt mr-2"></i>Rapports
+                </a>
+            </li>
+            <li>
+                <span class="text-gray-500">/</span>
+            </li>
+            <li class="text-gray-900 font-medium">
+                {{ rapport.titre[:50] }}{% if rapport.titre|length > 50 %}...{% endif %}
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Header avec actions -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-start justify-between">
+            <div class="flex-1">
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">
+                    {{ rapport.titre }}
+                </h1>
+                <div class="flex items-center space-x-4 text-sm text-gray-500">
+                    <span class="flex items-center">
+                        <i class="fas fa-user mr-1"></i>
+                        {{ rapport.personnel.nom }} {{ rapport.personnel.prenom }}
+                    </span>
+                    <span class="flex items-center">
+                        <i class="fas fa-calendar mr-1"></i>
+                        {{ rapport.date_creation.strftime('%d/%m/%Y à %H:%M') }}
+                    </span>
+                    {% if rapport.date_modification != rapport.date_creation %}
+                    <span class="flex items-center">
+                        <i class="fas fa-edit mr-1"></i>
+                        Modifié le {{ rapport.date_modification.strftime('%d/%m/%Y à %H:%M') }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Statut -->
+            <div class="ml-6">
+                {% if rapport.statut == 'brouillon' %}
+                    <span class="inline-flex items-center px-3 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                        <i class="fas fa-edit mr-2"></i>
+                        Brouillon
+                    </span>
+                {% elif rapport.statut == 'soumis' %}
+                    <span class="inline-flex items-center px-3 py-2 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                        <i class="fas fa-clock mr-2"></i>
+                        En attente de validation
+                    </span>
+                {% elif rapport.statut == 'validé' %}
+                    <span class="inline-flex items-center px-3 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        Validé
+                    </span>
+                {% elif rapport.statut == 'rejeté' %}
+                    <span class="inline-flex items-center px-3 py-2 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                        <i class="fas fa-times-circle mr-2"></i>
+                        Rejeté
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="mt-6 flex items-center space-x-3">
+            <a href="{{ url_for('rapport_download', id=rapport.id) }}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 transform hover:scale-105">
+                <i class="fas fa-download mr-2"></i>
+                Télécharger
+            </a>
+
+            {% if session.role == 'Administrator' or rapport.personnel_id == session.id %}
+            <a href="{{ url_for('rapport_edit', id=rapport.id) }}" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200">
+                <i class="fas fa-edit mr-2"></i>
+                Modifier
+            </a>
+
+            <button onclick="deleteRapport({{ rapport.id }}, '{{ rapport.titre }}')" 
+                    class="inline-flex items-center px-4 py-2 border border-red-300 text-sm font-medium rounded-lg text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200">
+                <i class="fas fa-trash mr-2"></i>
+                Supprimer
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Informations principales -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Description -->
+            {% if rapport.description %}
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-align-left text-purple-500 mr-3"></i>
+                    Description
+                </h3>
+                <div class="text-gray-700 whitespace-pre-wrap">
+                    {{ rapport.description }}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Observations -->
+            {% if rapport.observations %}
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-sticky-note text-blue-500 mr-3"></i>
+                    Observations
+                </h3>
+                <div class="text-gray-700 whitespace-pre-wrap">
+                    {{ rapport.observations }}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Fichier -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-file text-orange-500 mr-3"></i>
+                    Fichier du rapport
+                </h3>
+                
+                <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            {% if rapport.type_fichier == 'pdf' %}
+                                <i class="fas fa-file-pdf text-red-500 text-2xl mr-4"></i>
+                            {% else %}
+                                <i class="fas fa-file-word text-blue-500 text-2xl mr-4"></i>
+                            {% endif %}
+                            
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">
+                                    {{ rapport.nom_fichier }}
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    {{ (rapport.taille_fichier / 1024 / 1024) | round(2) }} MB
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <a href="{{ url_for('rapport_download', id=rapport.id) }}" 
+                           class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-download mr-1"></i>
+                            Ouvrir
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar - Informations complémentaires -->
+        <div class="space-y-6">
+            <!-- Période -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-calendar-alt text-green-500 mr-3"></i>
+                    Période couverte
+                </h3>
+                
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-500">Début :</span>
+                        <span class="text-sm font-medium text-gray-900">
+                            {{ rapport.semaine_debut.strftime('%d/%m/%Y') }}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-500">Fin :</span>
+                        <span class="text-sm font-medium text-gray-900">
+                            {{ rapport.semaine_fin.strftime('%d/%m/%Y') }}
+                        </span>
+                    </div>
+                    <div class="pt-2 border-t border-gray-200">
+                        <span class="text-xs text-gray-500">Durée :</span>
+                        <span class="text-xs font-medium text-gray-700 ml-2">
+                            {{ (rapport.semaine_fin - rapport.semaine_debut).days + 1 }} jours
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Auteur -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-user text-purple-500 mr-3"></i>
+                    Auteur
+                </h3>
+                
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="h-12 w-12 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">
+                            {{ rapport.personnel.nom }} {{ rapport.personnel.prenom }}
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            {{ rapport.personnel.departement }}
+                        </div>
+                        {% if rapport.personnel.email %}
+                        <div class="text-xs text-gray-400">
+                            {{ rapport.personnel.email }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Métadonnées -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-info-circle text-blue-500 mr-3"></i>
+                    Informations
+                </h3>
+                
+                <div class="space-y-3 text-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-500">ID :</span>
+                        <span class="font-mono text-gray-900">#{{ rapport.id }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-500">Type :</span>
+                        <span class="uppercase font-medium text-gray-900">{{ rapport.type_fichier }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-500">Taille :</span>
+                        <span class="text-gray-900">{{ (rapport.taille_fichier / 1024 / 1024) | round(2) }} MB</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-500">Créé :</span>
+                        <span class="text-gray-900">{{ rapport.date_creation.strftime('%d/%m/%Y') }}</span>
+                    </div>
+                    {% if rapport.date_modification != rapport.date_creation %}
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-500">Modifié :</span>
+                        <span class="text-gray-900">{{ rapport.date_modification.strftime('%d/%m/%Y') }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function deleteRapport(id, titre) {
+    if (confirm(`Êtes-vous sûr de vouloir supprimer le rapport "${titre}" ?\n\nCette action est irréversible.`)) {
+        // Créer un formulaire de suppression
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/rapport/${id}/delete`;
+        
+        // Ajouter le token CSRF si nécessaire
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (csrfToken) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'csrf_token';
+            input.value = csrfToken.getAttribute('content');
+            form.appendChild(input);
+        }
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endblock %}

@@ -7,100 +7,85 @@
 <div class="space-y-6">
     <!-- Stats cards -->
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <!-- Total Personnel -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-200">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-users text-blue-600 text-xl"></i>
-                        </div>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Total Personnel</dt>
-                            <dd class="flex items-baseline">
-                                <div class="text-2xl font-semibold text-gray-900">{{ total_personnel }}</div>
-                                <div class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
-                                    <i class="fas fa-arrow-up text-xs mr-1"></i>
-                                    12%
-                                </div>
-                            </dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Personnel Actifs -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-200">
+        <div
+            class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 hover:shadow-lg transition-all duration-200 transform hover:scale-105">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-user-check text-green-600 text-xl"></i>
+                        <div
+                            class="w-12 h-12 bg-gradient-to-r from-green-400 to-green-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-user-check text-white text-xl"></i>
                         </div>
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Personnel Actifs</dt>
-                            <dd class="flex items-baseline">
-                                <div class="text-2xl font-semibold text-gray-900">{{ personnel_actifs }}</div>
-                                <div class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
-                                    <i class="fas fa-arrow-up text-xs mr-1"></i>
-                                    8%
-                                </div>
-                            </dd>
+                            <dd class="text-2xl font-bold text-gray-900">{{ personnel_actifs }}</dd>
                         </dl>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Projets -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-200">
+        <!-- Projets en cours -->
+        <div
+            class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 hover:shadow-lg transition-all duration-200 transform hover:scale-105">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-project-diagram text-purple-600 text-xl"></i>
+                        <div
+                            class="w-12 h-12 bg-gradient-to-r from-purple-400 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-project-diagram text-white text-xl"></i>
                         </div>
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Projets en cours</dt>
-                            <dd class="flex items-baseline">
-                                <div class="text-2xl font-semibold text-gray-900">8</div>
-                                <div class="ml-2 flex items-baseline text-sm font-semibold text-purple-600">
-                                    <i class="fas fa-minus text-xs mr-1"></i>
-                                    0%
-                                </div>
-                            </dd>
+                            <dd class="text-2xl font-bold text-gray-900">{{ projets_en_cours }}</dd>
                         </dl>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Revenus -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-200">
+        <!-- Revenus du mois -->
+        <div
+            class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 hover:shadow-lg transition-all duration-200 transform hover:scale-105">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-coins text-yellow-600 text-xl"></i>
+                        <div
+                            class="w-12 h-12 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-coins text-white text-xl"></i>
                         </div>
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-medium text-gray-500 truncate">Revenus ce mois</dt>
-                            <dd class="flex items-baseline">
-                                <div class="text-2xl font-semibold text-gray-900">€25,420</div>
-                                <div class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
-                                    <i class="fas fa-arrow-up text-xs mr-1"></i>
-                                    23%
-                                </div>
-                            </dd>
+                            <dd class="text-md font-bold text-gray-900">{{ "{:,.0f}".format(revenus_mois) }} FCFA</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Événements en cours -->
+        <div
+            class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 hover:shadow-lg transition-all duration-200 transform hover:scale-105">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-r from-red-400 to-red-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-calendar-alt text-white text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Événements</dt>
+                            <dd class="text-2xl font-bold text-gray-900">{{ evenements_en_cours }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -109,162 +94,241 @@
     </div>
 
     <!-- Charts row -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Départements chart -->
         <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold text-gray-900">Répartition par département</h3>
-                <div class="flex items-center space-x-2">
-                    <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <div class="w-3 h-3 bg-purple-500 rounded-full"></div>
-                    <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                </div>
             </div>
-            <div class="relative">
-                <canvas id="departmentChart" width="400" height="200"></canvas>
+            <div class="relative h-64">
+                <canvas id="departmentChart"></canvas>
             </div>
         </div>
 
-        <!-- Conventions chart -->
+        <!-- Revenus par département -->
         <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Types de conventions</h3>
-                <button class="text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-ellipsis-h"></i>
-                </button>
+                <h3 class="text-lg font-semibold text-gray-900">Revenus par département</h3>
             </div>
-            <div class="relative">
-                <canvas id="conventionChart" width="400" height="200"></canvas>
+            <div class="relative h-64">
+                <canvas id="revenusChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Prochains événements -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">
+                    <i class="fas fa-calendar-check mr-2 text-purple-600"></i>
+                    Prochains événements
+                </h3>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4">
+                    {% for event in prochains_evenements %}
+                    <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                        <div class="flex-shrink-0">
+                            <div
+                                class="w-10 h-10 bg-gradient-to-r from-purple-400 to-purple-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-calendar text-white text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 truncate">{{ event.nom }}</p>
+                            <div class="flex items-center space-x-2 mt-1">
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                    {% if event.departement == 'Trading' %}bg-blue-100 text-blue-800
+                                    {% elif event.departement == 'Academy' %}bg-green-100 text-green-800
+                                    {% elif event.departement == 'Digital' %}bg-purple-100 text-purple-800{% endif %}">
+                                    {{ event.departement }}
+                                </span>
+                                <p class="text-xs text-gray-500">{{ event.date_debut.strftime('%d/%m/%Y') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    {% if not prochains_evenements %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-calendar-times text-gray-400 text-2xl mb-2"></i>
+                        <p class="text-sm text-gray-500">Aucun événement prévu</p>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Recent personnel and activity -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Recent personnel -->
-        <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Nouvelles connexions du jour -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
             <div class="px-6 py-4 border-b border-gray-200">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-semibold text-gray-900">Derniers arrivés</h3>
-                    <a href="{{ url_for('personnel_list') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        <i class="fas fa-sign-in-alt mr-2 text-blue-600"></i>
+                        Connexions d'aujourd'hui
+                    </h3>
+                    <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {{ utilisateurs_connectes_aujourd_hui|length }} connexion(s)
+                    </span>
+                </div>
+            </div>
+            <div class="p-6">
+                {% if utilisateurs_connectes_aujourd_hui %}
+                <!-- Zone scrollable -->
+                <div class="space-y-4 max-h-64 overflow-y-auto">
+                    {% for user in utilisateurs_connectes_aujourd_hui %}
+                    <div
+                        class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                        <div class="flex items-center space-x-3">
+                            <!-- Avatar utilisateur -->
+                            <div class="flex-shrink-0">
+                                <div
+                                    class="w-10 h-10 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-sm font-medium">
+                                        {{ user.prenom[0] if user.prenom else 'U' }}{{ user.nom[0] if user.nom else 'U'
+                                        }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Informations utilisateur -->
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center space-x-2">
+                                    <p class="text-sm font-medium text-gray-900">
+                                        {{ user.prenom }} {{ user.nom }}
+                                    </p>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                            {% if user.departement == 'Trading' %}bg-blue-100 text-blue-800
+                            {% elif user.departement == 'Academy' %}bg-green-100 text-green-800
+                            {% elif user.departement == 'Digital' %}bg-purple-100 text-purple-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                        {{ user.departement }}
+                                    </span>
+                                </div>
+
+                                <!-- Heure et IP -->
+                                <div class="flex items-center space-x-4 mt-1">
+                                    <div class="flex items-center space-x-1">
+                                        <i class="fas fa-clock text-gray-400 text-xs"></i>
+                                        <span class="text-xs text-gray-500">{{ user.heure_connexion }}</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <i class="fas fa-globe text-gray-400 text-xs"></i>
+                                        <span class="text-xs text-gray-500 font-mono">{{ user.ip_address }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Indicateur de statut -->
+                        <div class="flex-shrink-0">
+                            <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <!-- Aucune connexion aujourd'hui -->
+                <div class="text-center py-8">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user-clock text-gray-400 text-xl"></i>
+                    </div>
+                    <p class="text-sm text-gray-500">Aucune connexion enregistrée aujourd'hui</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <!-- Journal d'activité -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        <i class="fas fa-history mr-2 text-blue-600"></i>
+                        Journal d'activité
+                    </h3>
+                    <a href="{{url_for('journal_list')}}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
                         Voir tout
-                        <i class="fas fa-arrow-right ml-1 text-xs"></i>
                     </a>
                 </div>
             </div>
-            <div class="overflow-hidden">
-                <ul class="divide-y divide-gray-200">
-                    {% for person in recent_personnel %}
-                    <li class="px-6 py-4 hover:bg-gray-50 transition-colors duration-200">
-                        <div class="flex items-center space-x-4">
-                            <div class="flex-shrink-0">
-                                <div class="w-10 h-10 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-                                    <span class="text-white text-sm font-medium">
-                                        {{ person.prenom[0] if person.prenom else 'U' }}{{ person.nom[0] if person.nom else 'U' }}
-                                    </span>
+            <div class="p-6">
+                <!-- Zone scrollable -->
+                <div class="flow-root max-h-64 overflow-y-auto">
+                    <ul class="-mb-8">
+                        {% for activity in recent_activities %}
+                        <li class="relative{% if not loop.last %} pb-8{% endif %}">
+                            {% if not loop.last %}
+                            <span class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200"
+                                aria-hidden="true"></span>
+                            {% endif %}
+                            <div class="relative flex items-start space-x-3">
+                                <div class="relative">
+                                    <div class="h-10 w-10 rounded-full bg-gradient-to-r 
+                                {% if 'CREATION' in activity.action %}from-green-400 to-green-600
+                                {% elif 'MISE_A_JOUR' in activity.action %}from-blue-400 to-blue-600
+                                {% elif 'SUPPRESSION' in activity.action %}from-red-400 to-red-600
+                                {% else %}from-gray-400 to-gray-600{% endif %} 
+                                flex items-center justify-center">
+                                        <i class="fas 
+                                    {% if 'CREATION' in activity.action %}fa-plus
+                                    {% elif 'MISE_A_JOUR' in activity.action %}fa-edit
+                                    {% elif 'SUPPRESSION' in activity.action %}fa-trash
+                                    {% else %}fa-info{% endif %} text-white text-sm"></i>
+                                    </div>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div>
+                                        <div class="text-sm">
+                                            <span class="font-medium text-gray-900">
+                                                {{ activity.personnel.prenom }} {{ activity.personnel.nom }}
+                                            </span>
+                                        </div>
+                                        <p class="mt-0.5 text-sm text-gray-500">{{ activity.description }}</p>
+                                    </div>
+                                    <div class="mt-2 text-xs text-gray-400">
+                                        <i class="fas fa-clock mr-1"></i>
+                                        {{ activity.date.strftime('%d/%m/%Y %H:%M') }}
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center space-x-3">
-                                    <p class="text-sm font-medium text-gray-900 truncate">
-                                        {{ person.prenom }} {{ person.nom }}
-                                    </p>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                        {% if person.departement == 'Trading' %}bg-blue-100 text-blue-800
-                                        {% elif person.departement == 'Academy' %}bg-green-100 text-green-800
-                                        {% elif person.departement == 'Digital' %}bg-purple-100 text-purple-800
-                                        {% else %}bg-gray-100 text-gray-800{% endif %}">
-                                        {{ person.departement }}
-                                    </span>
-                                </div>
-                                <div class="flex items-center space-x-4 mt-1">
-                                    <p class="text-sm text-gray-500">{{ person.convention }}</p>
-                                    <p class="text-sm text-gray-500">
-                                        <i class="fas fa-calendar text-xs mr-1"></i>
-                                        {{ person.date_arrivee.strftime('%d/%m/%Y') if person.date_arrivee else 'N/A' }}
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="flex-shrink-0">
-                                <a href="{{ url_for('personnel_detail', id=person.id) }}" 
-                                   class="text-gray-400 hover:text-gray-600">
-                                    <i class="fas fa-chevron-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </li>
-                    {% endfor %}
-                </ul>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         </div>
 
-        <!-- Activity feed -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">Activité récente</h3>
-            </div>
-            <div class="p-6">
-                <div class="flow-root">
-                    <ul class="-mb-8">
-                        <li class="relative">
-                            <div class="absolute left-0 top-0 flex h-6 w-6 items-center justify-center">
-                                <div class="h-1.5 w-1.5 rounded-full bg-blue-600 ring-1 ring-blue-600"></div>
-                            </div>
-                            <div class="ml-9">
-                                <div class="min-w-0 flex-1">
-                                    <div>
-                                        <div class="text-sm">
-                                            <span class="font-medium text-gray-900">Nouveau personnel</span>
-                                        </div>
-                                        <p class="mt-0.5 text-sm text-gray-500">John Doe ajouté au département Trading</p>
-                                    </div>
-                                    <div class="mt-2 text-sm text-gray-700">
-                                        <time>Il y a 2 heures</time>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
 
-                        <li class="relative mt-6">
-                            <div class="absolute left-0 top-0 flex h-6 w-6 items-center justify-center">
-                                <div class="h-1.5 w-1.5 rounded-full bg-green-600 ring-1 ring-green-600"></div>
-                            </div>
-                            <div class="ml-9">
-                                <div class="min-w-0 flex-1">
-                                    <div>
-                                        <div class="text-sm">
-                                            <span class="font-medium text-gray-900">Projet terminé</span>
-                                        </div>
-                                        <p class="mt-0.5 text-sm text-gray-500">Site web E-commerce livré</p>
-                                    </div>
-                                    <div class="mt-2 text-sm text-gray-700">
-                                        <time>Il y a 1 jour</time>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
+    </div>
 
-                        <li class="relative mt-6">
-                            <div class="absolute left-0 top-0 flex h-6 w-6 items-center justify-center">
-                                <div class="h-1.5 w-1.5 rounded-full bg-yellow-600 ring-1 ring-yellow-600"></div>
-                            </div>
-                            <div class="ml-9">
-                                <div class="min-w-0 flex-1">
-                                    <div>
-                                        <div class="text-sm">
-                                            <span class="font-medium text-gray-900">Formation Academy</span>
-                                        </div>
-                                        <p class="mt-0.5 text-sm text-gray-500">Nouvelle session Python démarrée</p>
-                                    </div>
-                                    <div class="mt-2 text-sm text-gray-700">
-                                        <time>Il y a 3 jours</time>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
+    <!-- Top utilisateurs -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">
+                <i class="fas fa-star mr-2 text-yellow-600"></i>
+                Utilisateurs les plus actifs
+            </h3>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                {% for user in top_users %}
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <div
+                        class="w-12 h-12 bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-full mx-auto flex items-center justify-center mb-2">
+                        <span class="text-white text-sm font-bold">{{ user.prenom[0] }}{{ user.nom[0] }}</span>
+                    </div>
+                    <p class="text-sm font-medium text-gray-900">{{ user.prenom }} {{ user.nom }}</p>
+                    <p class="text-xs text-gray-500">{{ user.departement }}</p>
+                    <div class="mt-2">
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                            {{ user.activity_count }} activités
+                        </span>
+                    </div>
                 </div>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -280,6 +344,7 @@
         purple: '#8B5CF6',
         yellow: '#F59E0B',
         red: '#EF4444',
+        indigo: '#6366F1',
         gray: '#6B7280'
     };
 
@@ -289,59 +354,54 @@
         type: 'doughnut',
         data: {
             labels: [{% for dept, count in dept_stats %}'{{ dept }}'{{ ',' if not loop.last }}{% endfor %}],
-            datasets: [{
-                data: [{% for dept, count in dept_stats %}{{ count }}{{ ',' if not loop.last }}{% endfor %}],
-                backgroundColor: [chartColors.blue, chartColors.green, chartColors.purple, chartColors.yellow],
-                borderWidth: 2,
+    datasets: [{
+        data: [{% for dept, count in dept_stats %}{{ count }}{{ ',' if not loop.last }}{% endfor %}],
+        backgroundColor: [chartColors.blue, chartColors.green, chartColors.purple, chartColors.yellow],
+            borderWidth: 3,
                 borderColor: '#ffffff'
             }]
         },
-        options: {
-            responsive: true,
+    options: {
+        responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
+                plugins: {
+            legend: {
+                position: 'bottom',
                     labels: {
-                        padding: 20,
+                    padding: 15,
                         usePointStyle: true
-                    }
                 }
             }
         }
+    }
     });
 
-    // Convention chart
-    const convCtx = document.getElementById('conventionChart').getContext('2d');
-    const conventionChart = new Chart(convCtx, {
-        type: 'bar',
+    // Revenus chart
+    const revCtx = document.getElementById('revenusChart').getContext('2d');
+    const revenusChart = new Chart(revCtx, {
+        type: 'pie',
         data: {
-            labels: [{% for conv, count in convention_stats %}'{{ conv }}'{{ ',' if not loop.last }}{% endfor %}],
-            datasets: [{
-                label: 'Personnel',
-                data: [{% for conv, count in convention_stats %}{{ count }}{{ ',' if not loop.last }}{% endfor %}],
-                backgroundColor: [chartColors.blue, chartColors.green, chartColors.purple],
-                borderRadius: 6,
-                borderSkipped: false,
+            labels: [{% for rev in revenus_par_dept %}'{{ rev.departement }}'{{ ',' if not loop.last }}{% endfor %}],
+    datasets: [{
+        data: [{% for rev in revenus_par_dept %}{{ rev.montant }}{{ ',' if not loop.last }}{% endfor %}],
+        backgroundColor: [chartColors.blue, chartColors.green, chartColors.purple],
+            borderWidth: 3,
+                borderColor: '#ffffff'
             }]
         },
-        options: {
-            responsive: true,
+    options: {
+        responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
-                    }
+                plugins: {
+            legend: {
+                position: 'bottom',
+                    labels: {
+                    padding: 15,
+                        usePointStyle: true
                 }
             }
         }
+    }
     });
 </script>
 {% endblock %}

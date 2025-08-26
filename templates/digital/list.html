@@ -23,7 +23,6 @@
             </div>
 
             <!-- Add button -->
-            {% if session.role == 'Administrator' %}
             <div class="flex items-center space-x-4">
                 <a href="{{ url_for('digital_create') }}" 
                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 transform hover:scale-105">
@@ -31,7 +30,6 @@
                     Nouveau Digital
                 </a>
             </div>
-            {% endif %}
         </div>
     </div>
 
@@ -125,13 +123,13 @@
                                 </a>
                                 
                                 <!-- Edit -->
-                                {% if session.role == 'Administrator' %}
                                 <a href="{{ url_for('digital_edit', id=digital.id) }}" 
                                    class="text-green-600 hover:text-green-900 transition-colors duration-200">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 
                                 <!-- Delete -->
+                                {% if session.role == 'Administrator' %}
                                 <button @click="deleteDigital({{ digital.id }}, '{{ (digital.nom_client or '') + ' ' + (digital.prenom_client or '') }}')" 
                                         class="text-red-600 hover:text-red-900 transition-colors duration-200">
                                     <i class="fas fa-trash"></i>

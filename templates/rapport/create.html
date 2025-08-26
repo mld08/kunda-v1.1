@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Nouveau Rapport - KUNDA{% endblock %}
+{% block page_title %}Créer un Nouveau Rapport Hebdomadaire{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Breadcrumb -->
+    <nav class="flex" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-4">
+            <li>
+                <a href="{{ url_for('rapport_list') }}" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-file-alt mr-2"></i>Rapports
+                </a>
+            </li>
+            <li>
+                <span class="text-gray-500">/</span>
+            </li>
+            <li class="text-gray-900 font-medium">
+                Nouveau rapport
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                <i class="fas fa-plus-circle text-green-500 mr-3"></i>
+                Ajouter un Rapport Hebdomadaire
+            </h3>
+            <p class="mt-1 text-sm text-gray-500">
+                Téléchargez votre rapport hebdomadaire en format PDF ou Word (.doc, .docx)
+            </p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" class="p-6 space-y-6">
+            <!-- Titre -->
+            <div class="grid grid-cols-1 gap-6">
+                <div>
+                    <label for="titre" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-heading text-blue-500 mr-2"></i>Titre du rapport *
+                    </label>
+                    <input type="text" 
+                           id="titre" 
+                           name="titre" 
+                           required 
+                           maxlength="255"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="Ex: Rapport d'activités - Semaine 15">
+                </div>
+            </div>
+
+            <!-- Période -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="semaine_debut" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-calendar-alt text-green-500 mr-2"></i>Date de début *
+                    </label>
+                    <input type="date" 
+                           id="semaine_debut" 
+                           name="semaine_debut" 
+                           required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                </div>
+                <div>
+                    <label for="semaine_fin" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-calendar-check text-green-500 mr-2"></i>Date de fin *
+                    </label>
+                    <input type="date" 
+                           id="semaine_fin" 
+                           name="semaine_fin" 
+                           required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-align-left text-purple-500 mr-2"></i>Description (optionnel)
+                </label>
+                <textarea id="description" 
+                          name="description" 
+                          rows="4" 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                          placeholder="Résumé des activités et points importants de la semaine..."></textarea>
+            </div>
+
+            <!-- Upload de fichier -->
+            <div>
+                <label for="fichier" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-upload text-orange-500 mr-2"></i>Fichier du rapport *
+                </label>
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-orange-400 transition-colors duration-200">
+                    <div class="space-y-1 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <div class="flex text-sm text-gray-600">
+                            <label for="fichier" class="relative cursor-pointer bg-white rounded-md font-medium text-orange-600 hover:text-orange-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-orange-500">
+                                <span>Téléchargez un fichier</span>
+                                <input id="fichier" name="fichier" type="file" class="sr-only" required accept=".pdf,.doc,.docx">
+                            </label>
+                            <p class="pl-1">ou glissez-déposez</p>
+                        </div>
+                        <p class="text-xs text-gray-500">
+                            PDF, DOC, DOCX jusqu'à 16MB
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statut -->
+            <div>
+                <label for="statut" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-flag text-yellow-500 mr-2"></i>Statut
+                </label>
+                <select id="statut" 
+                        name="statut" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
+                    <option value="brouillon">Brouillon</option>
+                    <option value="soumis">Soumettre pour validation</option>
+                </select>
+                <p class="mt-1 text-xs text-gray-500">
+                    Choisissez "Brouillon" pour continuer à modifier plus tard, ou "Soumettre" pour envoyer à validation
+                </p>
+            </div>
+
+            <!-- Observations -->
+            <div>
+                <label for="observations" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-sticky-note text-blue-500 mr-2"></i>Observations (optionnel)
+                </label>
+                <textarea id="observations" 
+                          name="observations" 
+                          rows="3" 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Notes supplémentaires, commentaires..."></textarea>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+                <a href="{{ url_for('rapport_list') }}" 
+                   class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200">
+                    <i class="fas fa-times mr-2"></i>
+                    Annuler
+                </a>
+                <button type="submit" 
+                        class="px-6 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105">
+                    <i class="fas fa-save mr-2"></i>
+                    Enregistrer le rapport
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Validation des dates
+document.getElementById('semaine_debut').addEventListener('change', function() {
+    const debutDate = new Date(this.value);
+    const finInput = document.getElementById('semaine_fin');
+    
+    if (finInput.value) {
+        const finDate = new Date(finInput.value);
+        if (debutDate > finDate) {
+            finInput.value = '';
+        }
+    }
+    
+    // Définir la date minimum pour la fin
+    finInput.min = this.value;
+});
+
+document.getElementById('semaine_fin').addEventListener('change', function() {
+    const finDate = new Date(this.value);
+    const debutInput = document.getElementById('semaine_debut');
+    
+    if (debutInput.value) {
+        const debutDate = new Date(debutInput.value);
+        if (finDate < debutDate) {
+            this.value = '';
+            alert('La date de fin ne peut pas être antérieure à la date de début.');
+        }
+    }
+});
+
+// Prévisualisation du fichier sélectionné
+document.getElementById('fichier').addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+        const fileInfo = document.createElement('div');
+        fileInfo.className = 'mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm text-green-800';
+        fileInfo.innerHTML = `
+            <i class="fas fa-file mr-2"></i>
+            <strong>${file.name}</strong> - ${(file.size / 1024 / 1024).toFixed(2)} MB
+        `;
+        
+        // Supprimer l'ancienne info si elle existe
+        const existingInfo = this.parentNode.parentNode.querySelector('.mt-2');
+        if (existingInfo) {
+            existingInfo.remove();
+        }
+        
+        this.parentNode.parentNode.appendChild(fileInfo);
+    }
+});
+</script>
+{% endblock %}

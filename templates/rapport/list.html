@@ -1,0 +1,531 @@
+{% extends "base.html" %}
+
+{% block title %}Rapports Hebdomadaires - KUNDA{% endblock %}
+{% block page_title %}Gestion des Rapports Hebdomadaires{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header with search and filters -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+            <!-- Search -->
+            <div class="flex-1 max-w-lg">
+                <form method="GET" class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <input type="text" 
+                           name="search" 
+                           value="{{ search }}"
+                           class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                           placeholder="Rechercher par titre, description...">
+                </form>
+            </div>
+
+            <!-- Add button -->
+            <div class="flex items-center space-x-4">
+                <a href="{{ url_for('rapport_create') }}" 
+                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 transform hover:scale-105">
+                    <i class="fas fa-plus mr-2"></i>
+                    Nouveau Rapport
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {% set total_rapports = rapports.total %}
+        {% set rapports_soumis = rapports.items | selectattr('statut', 'equalto', 'soumis') | list | length %}
+        {% set rapports_valides = rapports.items | selectattr('statut', 'equalto', 'validé') | list | length %}
+        {% set rapports_brouillons = rapports.items | selectattr('statut', 'equalto', 'brouillon') | list | length %}
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-blue-100 mr-4">
+                    <i class="fas fa-file-alt text-blue-600"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Total Rapports</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ total_rapports }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-yellow-100 mr-4">
+                    <i class="fas fa-clock text-yellow-600"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-500">En attente</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ rapports_soumis }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 mr-4">
+                    <i class="fas fa-check-circle text-green-600"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Validés</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ rapports_valides }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-gray-100 mr-4">
+                    <i class="fas fa-edit text-gray-600"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Brouillons</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ rapports_brouillons }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters (ajouté) -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div class="flex flex-wrap items-center gap-4">
+            <span class="text-sm font-medium text-gray-700">Filtrer par statut :</span>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ url_for('rapport_list', search=search) }}" 
+                   class="px-3 py-1 rounded-full text-xs font-medium border {% if not request.args.get('statut') %}bg-blue-100 text-blue-800 border-blue-200{% else %}bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200{% endif %} transition-colors duration-200">
+                    Tous
+                </a>
+                <a href="{{ url_for('rapport_list', statut='brouillon', search=search) }}" 
+                   class="px-3 py-1 rounded-full text-xs font-medium border {% if request.args.get('statut') == 'brouillon' %}bg-gray-100 text-gray-800 border-gray-300{% else %}bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100{% endif %} transition-colors duration-200">
+                    Brouillons
+                </a>
+                <a href="{{ url_for('rapport_list', statut='soumis', search=search) }}" 
+                   class="px-3 py-1 rounded-full text-xs font-medium border {% if request.args.get('statut') == 'soumis' %}bg-yellow-100 text-yellow-800 border-yellow-200{% else %}bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100{% endif %} transition-colors duration-200">
+                    En attente
+                </a>
+                <a href="{{ url_for('rapport_list', statut='validé', search=search) }}" 
+                   class="px-3 py-1 rounded-full text-xs font-medium border {% if request.args.get('statut') == 'validé' %}bg-green-100 text-green-800 border-green-200{% else %}bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100{% endif %} transition-colors duration-200">
+                    Validés
+                </a>
+                <a href="{{ url_for('rapport_list', statut='rejeté', search=search) }}" 
+                   class="px-3 py-1 rounded-full text-xs font-medium border {% if request.args.get('statut') == 'rejeté' %}bg-red-100 text-red-800 border-red-200{% else %}bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100{% endif %} transition-colors duration-200">
+                    Rejetés
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rapports table -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        {% if rapports.items %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        {% if session.role == 'Administrator' %}
+                        <th scope="col" class="px-4 py-3">
+                            <input type="checkbox" id="select-all" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        </th>
+                        {% endif %}
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titre</th>
+                        {% if session.role == 'Administrator' %}
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Auteur</th>
+                        {% endif %}
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Période</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fichier</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date création</th>
+                        <th scope="col" class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for rapport in rapports.items %}
+                    <tr class="hover:bg-gray-50 transition-colors duration-200">
+                        {% if session.role == 'Administrator' %}
+                        <td class="px-4 py-4">
+                            <input type="checkbox" class="rapport-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="{{ rapport.id }}">
+                        </td>
+                        {% endif %}
+                        <td class="px-6 py-4">
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">
+                                    {{ rapport.titre }}
+                                </div>
+                                {% if rapport.description %}
+                                <div class="text-sm text-gray-500">
+                                    {{ rapport.description[:100] }}{% if rapport.description|length > 100 %}...{% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        {% if session.role == 'Administrator' %}
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-white text-sm"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">
+                                        {{ rapport.personnel.nom }} {{ rapport.personnel.prenom }}
+                                    </div>
+                                    <div class="text-sm text-gray-500">
+                                        {{ rapport.personnel.departement }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        {% endif %}
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">
+                                <div class="flex items-center">
+                                    <i class="fas fa-calendar mr-2 text-blue-400"></i>
+                                    {{ rapport.semaine_debut.strftime('%d/%m/%Y') }}
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    au {{ rapport.semaine_fin.strftime('%d/%m/%Y') }}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                {% if rapport.type_fichier == 'pdf' %}
+                                    <i class="fas fa-file-pdf text-red-500 mr-2"></i>
+                                {% else %}
+                                    <i class="fas fa-file-word text-blue-500 mr-2"></i>
+                                {% endif %}
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900">
+                                        {{ rapport.nom_fichier[:30] }}{% if rapport.nom_fichier|length > 30 %}...{% endif %}
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        {{ (rapport.taille_fichier / 1024 / 1024) | round(2) }} MB
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if rapport.statut == 'brouillon' %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                    <i class="fas fa-edit mr-1"></i>
+                                    Brouillon
+                                </span>
+                            {% elif rapport.statut == 'soumis' %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    <i class="fas fa-clock mr-1"></i>
+                                    Soumis
+                                </span>
+                            {% elif rapport.statut == 'validé' %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <i class="fas fa-check-circle mr-1"></i>
+                                    Validé
+                                </span>
+                            {% elif rapport.statut == 'rejeté' %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <i class="fas fa-times-circle mr-1"></i>
+                                    Rejeté
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ rapport.date_creation.strftime('%d/%m/%Y à %H:%M') }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div class="flex items-center justify-end space-x-2">
+                                <!-- View -->
+                                <a href="{{ url_for('rapport_detail', id=rapport.id) }}" 
+                                   class="text-blue-600 hover:text-blue-900 transition-colors duration-200"
+                                   title="Voir les détails">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                
+                                <!-- Download -->
+                                <a href="{{ url_for('rapport_download', id=rapport.id) }}" 
+                                   class="text-green-600 hover:text-green-900 transition-colors duration-200"
+                                   title="Télécharger">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                
+                                <!-- Edit (seul le propriétaire ou admin) -->
+                                {% if session.role == 'Administrator' or rapport.personnel_id == session.id %}
+                                <a href="{{ url_for('rapport_edit', id=rapport.id) }}" 
+                                   class="text-orange-600 hover:text-orange-900 transition-colors duration-200"
+                                   title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                
+                                <!-- Delete (seul le propriétaire ou admin) -->
+                                <button onclick="deleteRapport({{ rapport.id }}, '{{ rapport.titre }}')" 
+                                        class="text-red-600 hover:text-red-900 transition-colors duration-200"
+                                        title="Supprimer">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Actions en lot pour admin -->
+        {% if session.role == 'Administrator' %}
+        <div class="px-6 py-3 border-t border-gray-200 bg-gray-50" id="bulk-actions" style="display: none;">
+            <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-600">
+                    <span id="selected-count">0</span> rapport(s) sélectionné(s)
+                </span>
+                <div class="flex items-center space-x-2">
+                    <button onclick="bulkAction('validate')" 
+                            class="px-3 py-1 text-xs font-medium text-green-700 bg-green-100 border border-green-200 rounded hover:bg-green-200 transition-colors duration-200">
+                        <i class="fas fa-check mr-1"></i>Valider
+                    </button>
+                    <button onclick="bulkAction('reject')" 
+                            class="px-3 py-1 text-xs font-medium text-red-700 bg-red-100 border border-red-200 rounded hover:bg-red-200 transition-colors duration-200">
+                        <i class="fas fa-times mr-1"></i>Rejeter
+                    </button>
+                    <button onclick="bulkAction('delete')" 
+                            class="px-3 py-1 text-xs font-medium text-red-700 bg-red-100 border border-red-200 rounded hover:bg-red-200 transition-colors duration-200">
+                        <i class="fas fa-trash mr-1"></i>Supprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Pagination -->
+        {% if rapports.pages > 1 %}
+        <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+            <div class="flex items-center justify-between">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    {% if rapports.has_prev %}
+                    <a href="{{ url_for('rapport_list', page=rapports.prev_num, search=search, statut=request.args.get('statut')) }}" 
+                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Précédent
+                    </a>
+                    {% endif %}
+                    {% if rapports.has_next %}
+                    <a href="{{ url_for('rapport_list', page=rapports.next_num, search=search, statut=request.args.get('statut')) }}" 
+                       class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Suivant
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            Affichage de
+                            <span class="font-medium">{{ ((rapports.page - 1) * rapports.per_page) + 1 }}</span>
+                            à
+                            <span class="font-medium">{{ min(rapports.page * rapports.per_page, rapports.total) }}</span>
+                            sur
+                            <span class="font-medium">{{ rapports.total }}</span>
+                            résultats
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                            {% if rapports.has_prev %}
+                            <a href="{{ url_for('rapport_list', page=rapports.prev_num, search=search, statut=request.args.get('statut')) }}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                            {% endif %}
+                            
+                            {% for page_num in rapports.iter_pages() %}
+                                {% if page_num %}
+                                    {% if page_num != rapports.page %}
+                                    <a href="{{ url_for('rapport_list', page=page_num, search=search, statut=request.args.get('statut')) }}" 
+                                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                        {{ page_num }}
+                                    </a>
+                                    {% else %}
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600">
+                                        {{ page_num }}
+                                    </span>
+                                    {% endif %}
+                                {% else %}
+                                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                                    ...
+                                </span>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if rapports.has_next %}
+                            <a href="{{ url_for('rapport_list', page=rapports.next_num, search=search, statut=request.args.get('statut')) }}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- Empty state -->
+        <div class="text-center py-12">
+            <div class="mx-auto h-24 w-24 text-gray-400 mb-4">
+                <i class="fas fa-file-alt text-6xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun rapport trouvé</h3>
+            <p class="text-gray-500 mb-6">
+                {% if search %}
+                    Aucun rapport ne correspond à votre recherche "{{ search }}".
+                {% else %}
+                    Vous n'avez pas encore créé de rapport hebdomadaire.
+                {% endif %}
+            </p>
+            <a href="{{ url_for('rapport_create') }}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200">
+                <i class="fas fa-plus mr-2"></i>
+                Créer votre premier rapport
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Fonction de suppression
+function deleteRapport(id, titre) {
+    if (confirm(`Êtes-vous sûr de vouloir supprimer le rapport "${titre}" ?\n\nCette action est irréversible et supprimera également le fichier associé.`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/rapport/${id}/delete`;
+        
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (csrfToken) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'csrf_token';
+            input.value = csrfToken.getAttribute('content');
+            form.appendChild(input);
+        }
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Recherche automatique avec délai
+let searchTimeout;
+const searchInput = document.querySelector('input[name="search"]');
+if (searchInput) {
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            this.form.submit();
+        }, 500);
+    });
+}
+
+{% if session.role == 'Administrator' %}
+// Gestion des cases à cocher pour actions en lot
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAllCheckbox = document.getElementById('select-all');
+    const rapportCheckboxes = document.querySelectorAll('.rapport-checkbox');
+    const bulkActionsDiv = document.getElementById('bulk-actions');
+    const selectedCountSpan = document.getElementById('selected-count');
+
+    // Cocher/décocher tout
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            rapportCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateBulkActions();
+        });
+    }
+
+    // Mise à jour quand on coche individuellement
+    rapportCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateBulkActions);
+    });
+
+    function updateBulkActions() {
+        const selectedCheckboxes = document.querySelectorAll('.rapport-checkbox:checked');
+        const count = selectedCheckboxes.length;
+        
+        if (selectedCountSpan) selectedCountSpan.textContent = count;
+        
+        if (bulkActionsDiv) {
+            bulkActionsDiv.style.display = count > 0 ? 'block' : 'none';
+        }
+        
+        // Mettre à jour la case "tout sélectionner"
+        if (selectAllCheckbox) {
+            selectAllCheckbox.checked = count === rapportCheckboxes.length && count > 0;
+            selectAllCheckbox.indeterminate = count > 0 && count < rapportCheckboxes.length;
+        }
+    }
+});
+
+// Actions en lot
+function bulkAction(action) {
+    const selectedCheckboxes = document.querySelectorAll('.rapport-checkbox:checked');
+    const rapportIds = Array.from(selectedCheckboxes).map(cb => parseInt(cb.value));
+    
+    if (rapportIds.length === 0) {
+        alert('Veuillez sélectionner au moins un rapport.');
+        return;
+    }
+    
+    let confirmMessage = '';
+    let observations = null;
+    
+    switch(action) {
+        case 'delete':
+            confirmMessage = `Supprimer ${rapportIds.length} rapport(s) sélectionné(s) ?\n\nCette action est irréversible.`;
+            break;
+        case 'validate':
+            confirmMessage = `Valider ${rapportIds.length} rapport(s) sélectionné(s) ?`;
+            break;
+        case 'reject':
+            observations = prompt('Motif du rejet (optionnel) :');
+            if (observations === null) return; // Annulé par l'utilisateur
+            confirmMessage = `Rejeter ${rapportIds.length} rapport(s) sélectionné(s) ?`;
+            break;
+    }
+    
+    if (confirm(confirmMessage)) {
+        const data = {
+            action: action,
+            rapports: rapportIds
+        };
+        
+        if (observations) {
+            data.observations = observations;
+        }
+        
+        fetch('/rapport/bulk-action', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert('Erreur: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Erreur de communication: ' + error);
+        });
+    }
+}
+{% endif %}
+</script>
+{% endblock %}

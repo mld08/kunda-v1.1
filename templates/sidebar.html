@@ -3,10 +3,11 @@
     <div class="flex items-center flex-shrink-0 px-4 py-6">
         <div class="flex items-center">
             <div
-                class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <i class="fas fa-chart-bar text-white text-lg"></i>
+                class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <!-- <i class="fas fa-chart-bar text-white text-lg"></i> -->
+                <img src="{{url_for('static', filename='img/logo/logoSLCblanc.jpg')}}" alt="Logo" class="h-16 w-16">
             </div>
-            <h2 class="ml-3 text-xl font-bold text-gray-900">KUNDA</h2>
+            <h2 class="ml-3 text-2xl font-bold text-gray-900">KUNDA</h2>
         </div>
     </div>
 
@@ -61,16 +62,48 @@
             <div x-show="open" x-transition class="ml-6 space-y-1 overflow-hidden">
                 <a href="{{ url_for('materiel_list') }}"
                     class="nav-sub {% if request.endpoint == 'materiel_list' %}active{% endif %}"><i
-                        class="fas fa-box mr-3"></i>Matériel</a>
+                        class="fas fa-box mr-3"></i>Comptabilité des Matières</a>
                 <a href="{{ url_for('finance_list') }}"
                     class="nav-sub {% if request.endpoint == 'finance_list' %}active{% endif %}"><i
-                        class="fas fa-coins mr-3"></i>Finances</a>
-                <a href="#"
-                    class="nav-sub {% if request.endpoint == 'facture_list' %}active{% endif %}">
+                        class="fas fa-coins mr-3"></i>Comptabilité Financière</a>
+                <a href="#" class="nav-sub {% if request.endpoint == 'facture_list' %}active{% endif %}">
                     <i class="fas fa-file-invoice mr-3"></i>Factures
                 </a>
             </div>
         </div>
+
+        <!-- Rapports Hebdomadaires -->
+        <a href="{{ url_for('rapport_list') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition
+                  {% if request.endpoint and request.endpoint.startswith('rapport_') %}
+                      bg-green-100 text-green-700 border-r-2 border-green-700
+                  {% else %}
+                      text-gray-700 hover:bg-gray-100 hover:text-gray-900
+                  {% endif %}">
+            <i
+                class="fas fa-file-alt mr-3 text-lg
+                     {% if request.endpoint and request.endpoint.startswith('rapport_') %}text-green-700{% else %}text-gray-400 group-hover:text-gray-500{% endif %}"></i>
+            Rapports Hebdomadaires
+        </a>
+
+        <!-- Bloc Procès-Verbaux -->
+        <div
+            x-data="{ open: {{ 'true' if request.endpoint and request.endpoint.split('_')[0] in ['proces'] else 'false' }} }">
+            <button @click="open = !open"
+                class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-gray-900 ">
+                <i class="fas fa-file-signature mr-3 text-lg text-gray-400 group-hover:text-gray-500"></i>
+                Procès-verbaux
+                <i class="fas fa-chevron-right ml-auto text-xs transition-transform duration-200"
+                    :class="{'rotate-90': open}"></i>
+            </button>
+            <div x-show="open" x-transition class="ml-6 space-y-1 overflow-hidden">
+                <a href="{{ url_for('proces_verbal_list') }}"
+                    class="nav-sub {% if request.endpoint == 'proces_verbal_list' %}active{% endif %}">
+                    <i class="fas fa-file-signature mr-3"></i>Liste des PV
+                </a>
+            </div>
+        </div>
+
+
 
         <!-- Bloc Ressources -->
         <div

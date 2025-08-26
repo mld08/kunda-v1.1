@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}Journal - KUNDA{% endblock %}
+{% block page_title %}Journal des Actions{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header with search -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+            <!-- Search -->
+            <div class="flex-1 max-w-lg">
+                <form method="GET" class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <input type="text" 
+                           name="search" 
+                           value="{{ search }}"
+                           class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                           placeholder="Rechercher par action, description...">
+                </form>
+            </div>
+
+            <!-- Statistics -->
+            <div class="flex items-center space-x-4">
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg px-4 py-2">
+                    <div class="flex items-center">
+                        <i class="fas fa-book text-blue-600 mr-2"></i>
+                        <span class="text-sm font-medium text-blue-700">{{ journals.total }} entrées</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Journal table -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        {% if journals.items %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Personnel</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for journal in journals.items %}
+                    <tr class="hover:bg-gray-50 transition-colors duration-200">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {% if journal.date %}
+                                <div class="flex items-center">
+                                    <i class="fas fa-calendar mr-2 text-blue-400"></i>
+                                    <span class="font-medium">{{ journal.date.strftime('%d/%m/%Y') }}</span>
+                                </div>
+                            {% else %}
+                                <span class="text-gray-400 italic">Non définie</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if journal.action %}
+                                {% if 'CREATION' in journal.action %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                        <i class="fas fa-plus-circle mr-1"></i>
+                                        {{ journal.action }}
+                                    </span>
+                                {% elif 'MISE_A_JOUR' in journal.action %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                        <i class="fas fa-edit mr-1"></i>
+                                        {{ journal.action }}
+                                    </span>
+                                {% elif 'SUPPRESSION' in journal.action %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                                        <i class="fas fa-trash-alt mr-1"></i>
+                                        {{ journal.action }}
+                                    </span>
+                                {% else %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        {{ journal.action }}
+                                    </span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-gray-400 italic">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            {% if journal.description %}
+                                <div class="max-w-md">
+                                    <p class="truncate" title="{{ journal.description }}">
+                                        {{ journal.description }}
+                                    </p>
+                                </div>
+                            {% else %}
+                                <span class="text-gray-400 italic">Aucune description</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if journal.personnel %}
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-8 w-8">
+                                        <div class="h-8 w-8 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+                                            <i class="fas fa-user text-white text-xs"></i>
+                                        </div>
+                                    </div>
+                                    <div class="ml-3">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            {{ journal.personnel.nom or "" }} {{ journal.personnel.prenom or "" }}
+                                        </div>
+                                        {% if journal.personnel.email %}
+                                        <div class="text-xs text-gray-500">
+                                            <i class="fas fa-envelope mr-1"></i>
+                                            {{ journal.personnel.email }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-8 w-8">
+                                        <div class="h-8 w-8 bg-gray-300 rounded-full flex items-center justify-center">
+                                            <i class="fas fa-user-slash text-gray-500 text-xs"></i>
+                                        </div>
+                                    </div>
+                                    <div class="ml-3">
+                                        <div class="text-sm text-gray-500 italic">Personnel non défini</div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if journals.pages > 1 %}
+        <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+            <div class="flex items-center justify-between">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    {% if journals.has_prev %}
+                    <a href="{{ url_for('journal_list', page=journals.prev_num, search=search) }}" 
+                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Précédent
+                    </a>
+                    {% endif %}
+                    {% if journals.has_next %}
+                    <a href="{{ url_for('journal_list', page=journals.next_num, search=search) }}" 
+                       class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Suivant
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            Affichage de
+                            <span class="font-medium">{{ ((journals.page - 1) * journals.per_page) + 1 }}</span>
+                            à
+                            <span class="font-medium">{{ min(journals.page * journals.per_page, journals.total) }}</span>
+                            sur
+                            <span class="font-medium">{{ journals.total }}</span>
+                            résultats
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                            {% if journals.has_prev %}
+                            <a href="{{ url_for('journal_list', page=journals.prev_num, search=search) }}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                            {% endif %}
+                            
+                            {% for page_num in journals.iter_pages() %}
+                                {% if page_num %}
+                                    {% if page_num != journals.page %}
+                                    <a href="{{ url_for('journal_list', page=page_num, search=search) }}" 
+                                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                        {{ page_num }}
+                                    </a>
+                                    {% else %}
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600">
+                                        {{ page_num }}
+                                    </span>
+                                    {% endif %}
+                                {% else %}
+                                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                                    ...
+                                </span>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if journals.has_next %}
+                            <a href="{{ url_for('journal_list', page=journals.next_num, search=search) }}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% else %}
+        <!-- Empty state -->
+        <div class="text-center py-12">
+            <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-book-open text-gray-400 text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune entrée de journal trouvée</h3>
+            <p class="text-gray-500 mb-6">
+                {% if search %}
+                    Aucun résultat ne correspond à vos critères de recherche.
+                {% else %}
+                    Le journal des actions est vide pour le moment.
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Auto-submit search form on input
+    document.querySelector('input[name="search"]').addEventListener('input', function(e) {
+        clearTimeout(this.searchTimeout);
+        this.searchTimeout = setTimeout(() => {
+            e.target.closest('form').submit();
+        }, 500);
+    });
+</script>
+{% endblock %}
