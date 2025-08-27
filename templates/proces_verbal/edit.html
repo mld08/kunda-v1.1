@@ -1,0 +1,514 @@
+{% extends "base.html" %}
+
+{% block title %}Modifier Procès-Verbal - KUNDA{% endblock %}
+{% block page_title %}Modifier Procès-Verbal{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container--default .select2-selection--multiple {
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        min-height: 42px;
+        padding: 4px 8px;
+    }
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    .participant-row {
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        padding: 16px;
+        margin-bottom: 12px;
+    }
+    .status-warning {
+        background-color: #fef3c7;
+        border: 1px solid #f59e0b;
+        border-radius: 0.5rem;
+        padding: 12px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="flex-shrink-0">
+                        <div class="h-10 w-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-edit text-white"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-900">Modifier Procès-Verbal</h2>
+                        <p class="text-sm text-gray-500">
+                            Modification du PV #{{ pv.id }} - 
+                            {% if pv.statut == 'validé' %}
+                                <span class="text-green-600 font-medium">Validé</span>
+                            {% else %}
+                                <span class="text-yellow-600 font-medium">Brouillon</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <a href="{{ url_for('proces_verbal_detail', id=pv.id) }}" 
+                       class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-eye mr-2"></i>
+                        Voir le PV
+                    </a>
+                    <a href="{{ url_for('proces_verbal_list') }}" 
+                       class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Retour à la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Avertissement si PV validé -->
+        {% if pv.statut == 'validé' and session.role != 'Administrator' %}
+        <div class="px-6 py-4">
+            <div class="status-warning">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>
+                    <p class="text-sm text-yellow-800">
+                        <strong>Attention :</strong> Ce procès-verbal est validé. Seul un administrateur peut le modifier.
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Form -->
+        <form method="POST" class="p-6 space-y-6">
+            <!-- Informations générales -->
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                    <label for="titre" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-heading mr-1"></i>
+                        Titre de la réunion *
+                    </label>
+                    <input type="text" 
+                           name="titre" 
+                           id="titre" 
+                           required 
+                           value="{{ pv.titre }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="Ex: Réunion hebdomadaire équipe Trading">
+                </div>
+
+                <div>
+                    <label for="date_reunion" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-calendar mr-1"></i>
+                        Date de la réunion *
+                    </label>
+                    <input type="date" 
+                           name="date_reunion" 
+                           id="date_reunion" 
+                           required 
+                           value="{{ pv.date_reunion.strftime('%Y-%m-%d') }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label for="lieu" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-map-marker-alt mr-1"></i>
+                        Lieu de la réunion
+                    </label>
+                    <input type="text" 
+                           name="lieu" 
+                           id="lieu" 
+                           value="{{ pv.lieu or '' }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="Ex: Salle de conférence A, Zoom, etc.">
+                </div>
+
+                <div>
+                    <label for="heure_debut" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-clock mr-1"></i>
+                        Heure de début *
+                    </label>
+                    <input type="time" 
+                           name="heure_debut" 
+                           id="heure_debut" 
+                           required 
+                           value="{{ pv.heure_debut.strftime('%H:%M') }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label for="heure_fin" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-clock mr-1"></i>
+                        Heure de fin
+                    </label>
+                    <input type="time" 
+                           name="heure_fin" 
+                           id="heure_fin" 
+                           value="{{ pv.heure_fin.strftime('%H:%M') if pv.heure_fin else '' }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+
+            <!-- Ordre du jour -->
+            <div>
+                <label for="ordre_du_jour" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-list mr-1"></i>
+                    Ordre du jour *
+                </label>
+                <textarea name="ordre_du_jour" 
+                          id="ordre_du_jour" 
+                          required 
+                          rows="4" 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="1. Point 1&#10;2. Point 2&#10;3. Point 3...">{{ pv.ordre_du_jour }}</textarea>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-align-left mr-1"></i>
+                    Description/Contexte
+                </label>
+                <textarea name="description" 
+                          id="description" 
+                          rows="3" 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Contexte et objectifs de la réunion...">{{ pv.description or '' }}</textarea>
+            </div>
+
+            <!-- Participants -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">
+                    <i class="fas fa-users mr-1"></i>
+                    Participants à la réunion
+                </label>
+                
+                <div class="mb-4">
+                    <button type="button" 
+                            id="addParticipant" 
+                            class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-plus mr-2"></i>
+                        Ajouter un participant
+                    </button>
+                </div>
+
+                <div id="participantsList" class="space-y-3">
+                    <!-- Les participants existants seront chargés ici -->
+                </div>
+            </div>
+
+            <!-- Décisions prises -->
+            <div>
+                <label for="decisions_prises" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-check-circle mr-1"></i>
+                    Décisions prises
+                </label>
+                <textarea name="decisions_prises" 
+                          id="decisions_prises" 
+                          rows="4" 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Résumé des décisions importantes prises lors de la réunion...">{{ pv.decisions_prises or '' }}</textarea>
+            </div>
+
+            <!-- Actions à suivre -->
+            <div>
+                <label for="actions_suivre" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-tasks mr-1"></i>
+                    Actions à suivre
+                </label>
+                <textarea name="actions_suivre" 
+                          id="actions_suivre" 
+                          rows="4" 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Liste des tâches et actions à réaliser suite à cette réunion...">{{ pv.actions_suivre or '' }}</textarea>
+            </div>
+
+            <!-- Observations -->
+            <div>
+                <label for="observations" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-sticky-note mr-1"></i>
+                    Observations/Notes
+                </label>
+                <textarea name="observations" 
+                          id="observations" 
+                          rows="3" 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Observations particulières, remarques diverses...">{{ pv.observations or '' }}</textarea>
+            </div>
+
+            <!-- Statut -->
+            <div>
+                <label for="statut" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-flag mr-1"></i>
+                    Statut du procès-verbal
+                </label>
+                <select name="statut" 
+                        id="statut" 
+                        {% if session.role != 'Administrator' %}disabled{% endif %}
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 {% if session.role != 'Administrator' %}bg-gray-100{% endif %}">
+                    <option value="brouillon" {% if pv.statut == 'brouillon' %}selected{% endif %}>Brouillon</option>
+                    <option value="validé" {% if pv.statut == 'validé' %}selected{% endif %}>Validé</option>
+                </select>
+                <p class="mt-1 text-sm text-gray-500">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    {% if session.role == 'Administrator' %}
+                        Un brouillon peut être modifié, un procès-verbal validé est définitif.
+                    {% else %}
+                        Seul un administrateur peut modifier le statut du procès-verbal.
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- Informations de modification -->
+            {% if pv.date_modification %}
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-history mr-1"></i>
+                    Historique des modifications
+                </h4>
+                <div class="text-xs text-gray-600">
+                    <p>Dernière modification : {{ pv.date_modification.strftime('%d/%m/%Y à %H:%M') }}</p>
+                    <p>Créé le : {{ pv.date_creation.strftime('%d/%m/%Y à %H:%M') }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Boutons d'action -->
+            <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+                <a href="{{ url_for('proces_verbal_detail', id=pv.id) }}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                    <i class="fas fa-times mr-2"></i>
+                    Annuler
+                </a>
+                <button type="submit" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
+                    <i class="fas fa-save mr-2"></i>
+                    Enregistrer les modifications
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+let participantIndex = 0;
+
+// Stocker les données du personnel pour la génération dynamique
+const personnelData = [
+    {% for p in personnel_actif %}
+    {
+        id: {{ p.id }},
+        nom: "{{ p.nom }}",
+        prenom: "{{ p.prenom }}",
+        departement: "{{ p.departement }}",
+        role: "{{ p.role }}"
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+];
+
+// Participants existants
+const participantsExistants = [
+    {% for participant in participants_actuels %}
+    {
+        personnel_id: {{ participant.personnel_id }},
+        role_reunion: "{{ participant.role_reunion or '' }}",
+        present: {{ 'true' if participant.present else 'false' }}
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+];
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Charger les participants existants
+    loadExistingParticipants();
+    
+    // Événement pour ajouter un participant
+    document.getElementById('addParticipant').addEventListener('click', addParticipant);
+});
+
+function loadExistingParticipants() {
+    // Charger les participants existants
+    participantsExistants.forEach(participant => {
+        addParticipant(participant);
+    });
+    
+    // Si aucun participant existant, ajouter une ligne vide
+    if (participantsExistants.length === 0) {
+        addParticipant();
+    }
+}
+
+function addParticipant(existingData = null) {
+    participantIndex++;
+    
+    // Générer les options du select
+    let optionsHTML = '<option value="">Sélectionner un personnel</option>';
+    personnelData.forEach(p => {
+        const selected = existingData && existingData.personnel_id === p.id ? 'selected' : '';
+        optionsHTML += `<option value="${p.id}" data-departement="${p.departement}" data-role="${p.role}" ${selected}>
+                          ${p.nom} ${p.prenom} (${p.departement})
+                        </option>`;
+    });
+    
+    // Générer les options de rôle
+    const roles = [
+        { value: '', label: 'Participant' },
+        { value: 'Président', label: 'Président' },
+        { value: 'Secrétaire', label: 'Secrétaire' },
+        { value: 'Rapporteur', label: 'Rapporteur' },
+        { value: 'Invité', label: 'Invité' },
+        { value: 'Observateur', label: 'Observateur' }
+    ];
+    
+    let rolesHTML = '';
+    roles.forEach(role => {
+        const selected = existingData && existingData.role_reunion === role.value ? 'selected' : '';
+        rolesHTML += `<option value="${role.value}" ${selected}>${role.label}</option>`;
+    });
+    
+    const isPresent = existingData ? existingData.present : true;
+    const presentChecked = isPresent ? 'checked' : '';
+    
+    // Créer le HTML du participant dynamiquement
+    const participantHTML = `
+        <div class="participant-row" data-participant-index="${participantIndex}">
+            <div class="flex items-center justify-between mb-3">
+                <h4 class="text-sm font-medium text-gray-700">
+                    <i class="fas fa-user mr-1"></i>
+                    Participant <span class="participant-number">${participantIndex}</span>
+                </h4>
+                <button type="button" 
+                        class="remove-participant text-red-600 hover:text-red-900 transition-colors duration-200"
+                        title="Retirer ce participant">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div class="sm:col-span-1">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Personnel *</label>
+                    <select name="participants" 
+                            class="participant-select w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" 
+                            required>
+                        ${optionsHTML}
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Rôle dans la réunion</label>
+                    <select name="roles_reunion" 
+                            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        ${rolesHTML}
+                    </select>
+                </div>
+                
+                <div class="flex items-center justify-center">
+                    <label class="flex items-center">
+                        <input type="checkbox" 
+                               name="presents" 
+                               class="present-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" 
+                               value="${existingData ? existingData.personnel_id : ''}"
+                               ${presentChecked}>
+                        <span class="ml-2 text-sm text-gray-700">Présent</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Créer un élément temporaire pour insérer le HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = participantHTML;
+    const participantElement = tempDiv.firstElementChild;
+    
+    // Ajouter les événements
+    participantElement.querySelector('.remove-participant').addEventListener('click', function() {
+        removeParticipant(this);
+    });
+    
+    participantElement.querySelector('.participant-select').addEventListener('change', function() {
+        updateParticipantCheckboxValue(this);
+    });
+    
+    // Ajouter le participant à la liste
+    document.getElementById('participantsList').appendChild(participantElement);
+    
+    // Réorganiser les numéros
+    updateParticipantNumbers();
+}
+
+function removeParticipant(button) {
+    const participantRow = button.closest('.participant-row');
+    participantRow.remove();
+    updateParticipantNumbers();
+}
+
+function updateParticipantNumbers() {
+    const participants = document.querySelectorAll('.participant-row');
+    participants.forEach((participant, index) => {
+        const number = index + 1;
+        participant.querySelector('.participant-number').textContent = number;
+        participant.setAttribute('data-participant-index', number);
+    });
+}
+
+function updateParticipantCheckboxValue(selectElement) {
+    const participantRow = selectElement.closest('.participant-row');
+    const checkbox = participantRow.querySelector('.present-checkbox');
+    checkbox.value = selectElement.value;
+}
+
+// Validation du formulaire
+document.querySelector('form').addEventListener('submit', function(e) {
+    // Vérifier qu'au moins un participant est sélectionné
+    const participants = document.querySelectorAll('select[name="participants"]');
+    let hasValidParticipant = false;
+    
+    participants.forEach(select => {
+        if (select.value) {
+            hasValidParticipant = true;
+        }
+    });
+    
+    if (!hasValidParticipant) {
+        e.preventDefault();
+        alert('Veuillez sélectionner au moins un participant pour la réunion.');
+        return false;
+    }
+    
+    // Vérifier que l'heure de fin est après l'heure de début (si renseignée)
+    const heureDebut = document.getElementById('heure_debut').value;
+    const heureFin = document.getElementById('heure_fin').value;
+    
+    if (heureDebut && heureFin && heureFin <= heureDebut) {
+        e.preventDefault();
+        alert('L\'heure de fin doit être postérieure à l\'heure de début.');
+        return false;
+    }
+});
+
+// Auto-resize des textarea
+document.querySelectorAll('textarea').forEach(textarea => {
+    textarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+    
+    // Déclencher le resize initial pour les textareas avec du contenu
+    if (textarea.value.trim()) {
+        textarea.style.height = 'auto';
+        textarea.style.height = (textarea.scrollHeight) + 'px';
+    }
+});
+</script>
+{% endblock %}

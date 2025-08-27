@@ -151,14 +151,6 @@
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 
-                                <!-- Export PDF -->
-                                <a href="{{ url_for('proces_verbal_export_pdf', id=pv.id) }}" 
-                                   class="text-orange-600 hover:text-orange-900 transition-colors duration-200"
-                                   title="Exporter en PDF"
-                                   target="_blank">
-                                    <i class="fas fa-file-pdf"></i>
-                                </a>
-                                
                                 <!-- Edit (si créateur ou admin) -->
                                 {% if session.role == 'Administrator' or pv.created_by == session.id %}
                                 <a href="{{ url_for('proces_verbal_edit', id=pv.id) }}" 

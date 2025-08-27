@@ -1,0 +1,417 @@
+{% extends "base.html" %}
+
+{% block title %}Nouveau Procès-Verbal - KUNDA{% endblock %}
+{% block page_title %}Nouveau Procès-Verbal{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container--default .select2-selection--multiple {
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        min-height: 42px;
+        padding: 4px 8px;
+    }
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    .participant-row {
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        padding: 16px;
+        margin-bottom: 12px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="flex-shrink-0">
+                        <div class="h-10 w-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-file-alt text-white"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-900">Nouveau Procès-Verbal</h2>
+                        <p class="text-sm text-gray-500">Créer un nouveau rapport de réunion</p>
+                    </div>
+                </div>
+                <a href="{{ url_for('proces_verbal_list') }}" 
+                   class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Retour à la liste
+                </a>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form method="POST" class="p-6 space-y-6">
+            <!-- Informations générales -->
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                    <label for="titre" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-heading mr-1"></i>
+                        Titre de la réunion *
+                    </label>
+                    <input type="text" 
+                           name="titre" 
+                           id="titre" 
+                           required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                           placeholder="Ex: Réunion hebdomadaire équipe Trading">
+                </div>
+
+                <div>
+                    <label for="date_reunion" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-calendar mr-1"></i>
+                        Date de la réunion *
+                    </label>
+                    <input type="date" 
+                           name="date_reunion" 
+                           id="date_reunion" 
+                           required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                </div>
+
+                <div>
+                    <label for="lieu" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-map-marker-alt mr-1"></i>
+                        Lieu de la réunion
+                    </label>
+                    <input type="text" 
+                           name="lieu" 
+                           id="lieu" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                           placeholder="Ex: Salle de conférence A, Zoom, etc.">
+                </div>
+
+                <div>
+                    <label for="heure_debut" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-clock mr-1"></i>
+                        Heure de début *
+                    </label>
+                    <input type="time" 
+                           name="heure_debut" 
+                           id="heure_debut" 
+                           required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                </div>
+
+                <div>
+                    <label for="heure_fin" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-clock mr-1"></i>
+                        Heure de fin
+                    </label>
+                    <input type="time" 
+                           name="heure_fin" 
+                           id="heure_fin" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                </div>
+            </div>
+
+            <!-- Ordre du jour -->
+            <div>
+                <label for="ordre_du_jour" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-list mr-1"></i>
+                    Ordre du jour *
+                </label>
+                <textarea name="ordre_du_jour" 
+                          id="ordre_du_jour" 
+                          required 
+                          rows="4" 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                          placeholder="1. Point 1&#10;2. Point 2&#10;3. Point 3..."></textarea>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-align-left mr-1"></i>
+                    Description/Contexte
+                </label>
+                <textarea name="description" 
+                          id="description" 
+                          rows="3" 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                          placeholder="Contexte et objectifs de la réunion..."></textarea>
+            </div>
+
+            <!-- Participants -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">
+                    <i class="fas fa-users mr-1"></i>
+                    Participants à la réunion
+                </label>
+                
+                <div class="mb-4">
+                    <button type="button" 
+                            id="addParticipant" 
+                            class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                        <i class="fas fa-plus mr-2"></i>
+                        Ajouter un participant
+                    </button>
+                </div>
+
+                <div id="participantsList" class="space-y-3">
+                    <!-- Les participants seront ajoutés ici dynamiquement -->
+                </div>
+            </div>
+
+            <!-- Décisions prises -->
+            <div>
+                <label for="decisions_prises" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-check-circle mr-1"></i>
+                    Décisions prises
+                </label>
+                <textarea name="decisions_prises" 
+                          id="decisions_prises" 
+                          rows="4" 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                          placeholder="Résumé des décisions importantes prises lors de la réunion..."></textarea>
+            </div>
+
+            <!-- Actions à suivre -->
+            <div>
+                <label for="actions_suivre" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-tasks mr-1"></i>
+                    Actions à suivre
+                </label>
+                <textarea name="actions_suivre" 
+                          id="actions_suivre" 
+                          rows="4" 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                          placeholder="Liste des tâches et actions à réaliser suite à cette réunion..."></textarea>
+            </div>
+
+            <!-- Observations -->
+            <div>
+                <label for="observations" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-sticky-note mr-1"></i>
+                    Observations/Notes
+                </label>
+                <textarea name="observations" 
+                          id="observations" 
+                          rows="3" 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                          placeholder="Observations particulières, remarques diverses..."></textarea>
+            </div>
+
+            <!-- Statut -->
+            <div>
+                <label for="statut" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-flag mr-1"></i>
+                    Statut du procès-verbal
+                </label>
+                <select name="statut" 
+                        id="statut" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                    <option value="brouillon" selected>Brouillon</option>
+                    {% if session.role == 'Administrator' %}
+                    <option value="validé">Validé</option>
+                    {% endif %}
+                </select>
+                <p class="mt-1 text-sm text-gray-500">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Un brouillon peut être modifié, un procès-verbal validé est définitif.
+                </p>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+                <a href="{{ url_for('proces_verbal_list') }}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                    <i class="fas fa-times mr-2"></i>
+                    Annuler
+                </a>
+                <button type="submit" 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200">
+                    <i class="fas fa-save mr-2"></i>
+                    Créer le procès-verbal
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+let participantIndex = 0;
+
+// Stocker les données du personnel pour la génération dynamique
+const personnelData = [
+    {% for p in personnel_actif %}
+    {
+        id: {{ p.id }},
+        nom: "{{ p.nom }}",
+        prenom: "{{ p.prenom }}",
+        departement: "{{ p.departement }}",
+        role: "{{ p.role }}"
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+];
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialiser la date d'aujourd'hui par défaut
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('date_reunion').value = today;
+    
+    // Ajouter un participant par défaut
+    addParticipant();
+    
+    // Événement pour ajouter un participant
+    document.getElementById('addParticipant').addEventListener('click', addParticipant);
+});
+
+function addParticipant() {
+    participantIndex++;
+    
+    // Générer les options du select
+    let optionsHTML = '<option value="">Sélectionner un personnel</option>';
+    personnelData.forEach(p => {
+        optionsHTML += `<option value="${p.id}" data-departement="${p.departement}" data-role="${p.role}">
+                          ${p.nom} ${p.prenom} (${p.departement})
+                        </option>`;
+    });
+    
+    // Créer le HTML du participant dynamiquement
+    const participantHTML = `
+        <div class="participant-row" data-participant-index="${participantIndex}">
+            <div class="flex items-center justify-between mb-3">
+                <h4 class="text-sm font-medium text-gray-700">
+                    <i class="fas fa-user mr-1"></i>
+                    Participant <span class="participant-number">${participantIndex}</span>
+                </h4>
+                <button type="button" 
+                        class="remove-participant text-red-600 hover:text-red-900 transition-colors duration-200"
+                        title="Retirer ce participant">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div class="sm:col-span-1">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Personnel *</label>
+                    <select name="participants" 
+                            class="participant-select w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500" 
+                            required>
+                        ${optionsHTML}
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Rôle dans la réunion</label>
+                    <select name="roles_reunion" 
+                            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                        <option value="">Participant</option>
+                        <option value="Président">Président</option>
+                        <option value="Secrétaire">Secrétaire</option>
+                        <option value="Rapporteur">Rapporteur</option>
+                        <option value="Invité">Invité</option>
+                        <option value="Observateur">Observateur</option>
+                    </select>
+                </div>
+                
+                <div class="flex items-center justify-center">
+                    <label class="flex items-center">
+                        <input type="checkbox" 
+                               name="presents" 
+                               class="present-checkbox h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded" 
+                               value=""
+                               checked>
+                        <span class="ml-2 text-sm text-gray-700">Présent</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Créer un élément temporaire pour insérer le HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = participantHTML;
+    const participantElement = tempDiv.firstElementChild;
+    
+    // Ajouter les événements
+    participantElement.querySelector('.remove-participant').addEventListener('click', function() {
+        removeParticipant(this);
+    });
+    
+    participantElement.querySelector('.participant-select').addEventListener('change', function() {
+        updateParticipantCheckboxValue(this);
+    });
+    
+    // Ajouter le participant à la liste
+    document.getElementById('participantsList').appendChild(participantElement);
+    
+    // Réorganiser les numéros
+    updateParticipantNumbers();
+}
+
+function removeParticipant(button) {
+    const participantRow = button.closest('.participant-row');
+    participantRow.remove();
+    updateParticipantNumbers();
+}
+
+function updateParticipantNumbers() {
+    const participants = document.querySelectorAll('.participant-row');
+    participants.forEach((participant, index) => {
+        const number = index + 1;
+        participant.querySelector('.participant-number').textContent = number;
+        participant.setAttribute('data-participant-index', number);
+    });
+}
+
+function updateParticipantCheckboxValue(selectElement) {
+    const participantRow = selectElement.closest('.participant-row');
+    const checkbox = participantRow.querySelector('.present-checkbox');
+    checkbox.value = selectElement.value;
+}
+
+// Validation du formulaire
+document.querySelector('form').addEventListener('submit', function(e) {
+    // Vérifier qu'au moins un participant est sélectionné
+    const participants = document.querySelectorAll('select[name="participants"]');
+    let hasValidParticipant = false;
+    
+    participants.forEach(select => {
+        if (select.value) {
+            hasValidParticipant = true;
+        }
+    });
+    
+    if (!hasValidParticipant) {
+        e.preventDefault();
+        alert('Veuillez sélectionner au moins un participant pour la réunion.');
+        return false;
+    }
+    
+    // Vérifier que l'heure de fin est après l'heure de début (si renseignée)
+    const heureDebut = document.getElementById('heure_debut').value;
+    const heureFin = document.getElementById('heure_fin').value;
+    
+    if (heureDebut && heureFin && heureFin <= heureDebut) {
+        e.preventDefault();
+        alert('L\'heure de fin doit être postérieure à l\'heure de début.');
+        return false;
+    }
+});
+
+// Auto-resize des textarea
+document.querySelectorAll('textarea').forEach(textarea => {
+    textarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+});
+</script>
+{% endblock %}

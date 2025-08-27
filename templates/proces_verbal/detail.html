@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block title %}{{ pv.titre }} - KUNDA{% endblock %}
+{% block page_title %}Procès-Verbal{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="flex-shrink-0">
+                    <div class="h-12 w-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-file-alt text-white text-lg"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">{{ pv.titre }}</h1>
+                    <div class="flex items-center space-x-4 mt-2">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-calendar mr-1"></i>
+                            {{ pv.date_reunion.strftime('%d/%m/%Y') }}
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-clock mr-1"></i>
+                            {{ pv.heure_debut.strftime('%H:%M') }}
+                            {% if pv.heure_fin %}
+                                - {{ pv.heure_fin.strftime('%H:%M') }}
+                            {% endif %}
+                        </div>
+                        {% if pv.lieu %}
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-map-marker-alt mr-1"></i>
+                            {{ pv.lieu }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statut et actions -->
+            <div class="flex items-center space-x-4">
+                <!-- Statut -->
+                {% if pv.statut == 'brouillon' %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                        <i class="fas fa-edit mr-1"></i>
+                        Brouillon
+                    </span>
+                {% elif pv.statut == 'validé' %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                        <i class="fas fa-check-circle mr-1"></i>
+                        Validé
+                    </span>
+                {% elif pv.statut == 'archivé' %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                        <i class="fas fa-archive mr-1"></i>
+                        Archivé
+                    </span>
+                {% endif %}
+                
+                <!-- Actions -->
+                <div class="flex items-center space-x-2">
+                    
+                    <!-- Modifier (si créateur ou admin) -->
+                    {% if session.role == 'Administrator' or pv.created_by == session.id %}
+                    <a href="{{ url_for('proces_verbal_edit', id=pv.id) }}" 
+                       class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                        <i class="fas fa-edit mr-2"></i>
+                        Modifier
+                    </a>
+                    {% endif %}
+                    
+                    <!-- Retour -->
+                    <a href="{{ url_for('proces_verbal_list') }}" 
+                       class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Contenu principal -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Ordre du jour -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-list text-purple-500 mr-2"></i>
+                    Ordre du jour
+                </h2>
+                <div class="prose prose-sm max-w-none">
+                    <pre class="whitespace-pre-wrap text-gray-700 font-sans">{{ pv.ordre_du_jour }}</pre>
+                </div>
+            </div>
+
+            {% if pv.description %}
+            <!-- Description -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-align-left text-blue-500 mr-2"></i>
+                    Description/Contexte
+                </h2>
+                <div class="prose prose-sm max-w-none">
+                    <pre class="whitespace-pre-wrap text-gray-700 font-sans">{{ pv.description }}</pre>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if pv.decisions_prises %}
+            <!-- Décisions prises -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                    Décisions prises
+                </h2>
+                <div class="prose prose-sm max-w-none">
+                    <pre class="whitespace-pre-wrap text-gray-700 font-sans">{{ pv.decisions_prises }}</pre>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if pv.actions_suivre %}
+            <!-- Actions à suivre -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-tasks text-orange-500 mr-2"></i>
+                    Actions à suivre
+                </h2>
+                <div class="prose prose-sm max-w-none">
+                    <pre class="whitespace-pre-wrap text-gray-700 font-sans">{{ pv.actions_suivre }}</pre>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if pv.observations %}
+            <!-- Observations -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-sticky-note text-yellow-500 mr-2"></i>
+                    Observations/Notes
+                </h2>
+                <div class="prose prose-sm max-w-none">
+                    <pre class="whitespace-pre-wrap text-gray-700 font-sans">{{ pv.observations }}</pre>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Informations générales -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                    Informations
+                </h3>
+                <dl class="space-y-3">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Créé par</dt>
+                        <dd class="text-sm text-gray-900 mt-1">
+                            <div class="flex items-center space-x-2">
+                                <div class="h-6 w-6 bg-gray-300 rounded-full flex items-center justify-center">
+                                    <span class="text-xs font-medium text-gray-700">
+                                        {{ pv.createur.nom[0] }}{{ pv.createur.prenom[0] }}
+                                    </span>
+                                </div>
+                                <span>{{ pv.createur.nom }} {{ pv.createur.prenom }}</span>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">{{ pv.createur.departement }}</div>
+                        </dd>
+                    </div>
+                    
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Date de création</dt>
+                        <dd class="text-sm text-gray-900 mt-1">
+                            {{ pv.date_creation.strftime('%d/%m/%Y à %H:%M') }}
+                        </dd>
+                    </div>
+                    
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Dernière modification</dt>
+                        <dd class="text-sm text-gray-900 mt-1">
+                            {{ pv.date_modification.strftime('%d/%m/%Y à %H:%M') }}
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+
+            <!-- Participants -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-users text-green-500 mr-2"></i>
+                    Participants ({{ participants|length }})
+                </h3>
+                
+                {% if participants %}
+                <div class="space-y-3">
+                    {% for participant_data, personnel in participants %}
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <!-- Avatar -->
+                            <div class="h-8 w-8 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                                <span class="text-xs font-medium text-white">
+                                    {{ personnel.nom[0] }}{{ personnel.prenom[0] }}
+                                </span>
+                            </div>
+                            
+                            <!-- Info participant -->
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">
+                                    {{ personnel.nom }} {{ personnel.prenom }}
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    {{ personnel.departement }}
+                                    {% if participant_data.role_reunion %}
+                                        • {{ participant_data.role_reunion }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Statut présence -->
+                        <div class="flex items-center">
+                            {% if participant_data.present %}
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <i class="fas fa-check mr-1"></i>
+                                    Présent
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <i class="fas fa-times mr-1"></i>
+                                    Absent
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Résumé présences -->
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                    {% set presents = participants | selectattr('0.present', 'equalto', true) | list %}
+                    {% set absents = participants | selectattr('0.present', 'equalto', false) | list %}
+                    
+                    <div class="flex justify-between text-sm">
+                        <span class="text-green-600">
+                            <i class="fas fa-check-circle mr-1"></i>
+                            {{ presents|length }} présent(s)
+                        </span>
+                        <span class="text-red-600">
+                            <i class="fas fa-times-circle mr-1"></i>
+                            {{ absents|length }} absent(s)
+                        </span>
+                    </div>
+                </div>
+                
+                {% else %}
+                <div class="text-center text-gray-500 py-4">
+                    <i class="fas fa-users text-2xl mb-2"></i>
+                    <p class="text-sm">Aucun participant enregistré</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Actions rapides (admin uniquement) -->
+            {% if session.role == 'Administrator' %}
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-cogs text-gray-500 mr-2"></i>
+                    Actions administrateur
+                </h3>
+                
+                <div class="space-y-3">
+                    <!-- Changer le statut -->
+                    <form method="POST" action="{{ url_for('proces_verbal_edit', id=pv.id) }}" class="inline">
+                        <input type="hidden" name="action" value="change_status">
+                        <select name="statut" onchange="this.form.submit()" 
+                                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                            <option value="brouillon" {% if pv.statut == 'brouillon' %}selected{% endif %}>Brouillon</option>
+                            <option value="validé" {% if pv.statut == 'validé' %}selected{% endif %}>Validé</option>
+                            <option value="archivé" {% if pv.statut == 'archivé' %}selected{% endif %}>Archivé</option>
+                        </select>
+                    </form>
+                    
+                    <!-- Supprimer -->
+                    <button onclick="deletePV({{ pv.id }}, '{{ pv.titre }}')" 
+                            class="w-full inline-flex items-center justify-center px-3 py-2 border border-red-300 text-sm leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        <i class="fas fa-trash mr-2"></i>
+                        Supprimer
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div id="deleteModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mt-4">Confirmer la suppression</h3>
+            <div class="mt-2 px-7 py-3">
+                <p class="text-sm text-gray-500">
+                    Êtes-vous sûr de vouloir supprimer le procès-verbal "<span id="pvTitle"></span>" ?
+                    Cette action est irréversible.
+                </p>
+            </div>
+            <div class="flex justify-center space-x-4 mt-4">
+                <button id="cancelDelete" 
+                        class="px-4 py-2 bg-gray-300 text-gray-700 text-base font-medium rounded-md shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    Annuler
+                </button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit" 
+                            class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function deletePV(id, titre) {
+    document.getElementById('pvTitle').textContent = titre;
+    document.getElementById('deleteForm').action = `/proces-verbal/${id}/delete`;
+    document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+document.getElementById('cancelDelete').onclick = function() {
+    document.getElementById('deleteModal').classList.add('hidden');
+};
+
+// Fermer le modal en cliquant à l'extérieur
+document.getElementById('deleteModal').onclick = function(e) {
+    if (e.target === this) {
+        this.classList.add('hidden');
+    }
+};
+</script>
+{% endblock %}
