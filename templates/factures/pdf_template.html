@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facture {{ facture.numero_facture }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            border: 2px solid #333;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: none;
+        }
+
+        .header-table td {
+            vertical-align: top;
+            border: none;
+            padding: 0;
+        }
+
+        .company-info {
+            width: 65%;
+            padding-right: 20px;
+        }
+
+        .logo-section {
+            width: 35%;
+            text-align: right;
+        }
+
+        .company-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c5aa0;
+            margin-bottom: 10px;
+        }
+
+        .company-details {
+            font-size: 11px;
+            line-height: 1.3;
+        }
+
+        .logo {
+            /*max-width: 100px;
+            max-height: 90px; */
+            width: 130px;
+            height: auto;
+        }
+
+        .invoice-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 30px 0;
+            text-decoration: underline;
+        }
+
+        .client-section {
+            margin-bottom: 30px;
+        }
+
+        .client-label {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .client-info {
+            border: 1px solid #ccc;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .invoice-table th {
+            background-color: #e8e8e8;
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .invoice-table td {
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .invoice-table .description {
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .totals-table {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .totals-table td {
+            padding: 5px;
+            border: 1px solid #333;
+        }
+
+        .totals-table .label {
+            font-weight: bold;
+            background-color: #f0f0f0;
+        }
+
+        .totals-table .amount {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .payment-conditions {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .conditions-title {
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 10px;
+        }
+
+        .conditions-content {
+            margin-bottom: 10px;
+        }
+
+        .signature-section {
+            margin-top: 50px;
+            text-align: right;
+        }
+
+        .signature-title {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 20mm;
+            left: 20mm;
+            right: 20mm;
+            text-align: left;
+            font-size: 20px;
+            font-style: italic;
+            font-family: "Bookman Old Style", "Book Antiqua", Palatino, serif;
+            margin-top: 20px;
+        }
+        .footer-left {
+            text-align: left;
+            vertical-align: bottom;
+            width: 50%;
+        }
+
+        .footer-left p{
+            font-style: italic;
+        }
+
+        .number-format {
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- En-tête de l'entreprise -->
+    <div class="header">
+        <table class="header-table">
+            <tr>
+                <td class="company-info">
+                    <div class="company-name">Sano Logistic Company</div>
+                    <div class="company-details">
+                        <strong>NINEA:</strong> 0047708231A2<br>
+                        <strong>RC:</strong> 2013-A-5194SN Dakar<br><br>
+                        <strong>Adresse:</strong> Sacré-cœur 3, Pyrotechnique villa 85 B<br>
+                        <strong>TEL:</strong> 785467866/779890398<br>
+                        <strong>Mail:</strong> sano-logistic@sano-logistic.com<br>
+                        <strong>Site web:</strong> sano-logistic.com
+                    </div>
+                </td>
+                <td class="logo-section">
+                    <!-- Logo de l'entreprise en base64 -->
+                    {% if logo_base64 %}
+                    <img src="{{ logo_base64 }}" alt="Logo SANO LOGISTIC" class="logo">
+                    {% else %}
+                    <div style="border: 1px dashed #ccc; padding: 20px; text-align: center; color: #999;">
+                        Logo<br>SANO LOGISTIC
+                    </div>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Titre de la facture -->
+    <div class="invoice-title">
+        <strong>Facture N° {{ facture.numero_facture }}</strong>
+    </div>
+
+    <!-- Informations client -->
+    <div class="client-section">
+        <div class="client-label">
+            <strong>Facturé à:</strong>
+        </div>
+        <div class="client-info">
+            <strong>{{ facture.nom_client or "Client non défini" }}</strong><br>
+            {% if facture.adresse_client %}{{ facture.adresse_client|replace('\n', '<br>')|safe }}<br>{% endif %}
+            {% if facture.telephone_client %}Tél: {{ facture.telephone_client }}<br>{% endif %}
+            {% if facture.email_client %}Email: {{ facture.email_client }}{% endif %}
+        </div>
+    </div>
+
+    <!-- Date de facture -->
+    <div style="margin-bottom: 20px;">
+        <strong>Date:</strong> {{ facture.date_facture.strftime('%d/%m/%Y') if facture.date_facture else 'Non définie'
+        }}
+    </div>
+
+    <!-- Titre des services -->
+    <div class="invoice-title">Titre: <strong>{{ facture.designation }}</strong></div>
+
+    <!-- Tableau des articles -->
+    <table class="invoice-table">
+        <thead>
+            <tr>
+                <th style="width: 50%;">Désignations</th>
+                <th style="width: 10%;">Nbre</th>
+                <th style="width: 20%;">PU</th>
+                <th style="width: 20%;">Montant Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="description">{{ facture.designation }}</td>
+                <td>{{ facture.quantite or 1 }}</td>
+                <td class="number-format">{{ "{:,.0f}".format(facture.prix_unitaire) if facture.prix_unitaire else "0"
+                    }}</td>
+                <td class="number-format">{{ "{:,.0f}".format(facture.montant_ht) if facture.montant_ht else "0" }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Tableau des totaux -->
+    <table class="totals-table">
+        <tr>
+            <td class="label" style="width: 70%;">Total HT FCFA</td>
+            <td class="amount"><strong>{{ "{:,.0f}".format(facture.montant_ht) if facture.montant_ht else "0"
+                    }}</strong></td>
+        </tr>
+        <tr>
+            <td class="label">TVA {{ "{:.0f}".format(facture.tva) if facture.tva else "0" }}%</td>
+            <td class="amount">
+                <strong>
+                    {% if facture.montant_ht and facture.tva %}
+                    {{ "{:,.0f}".format((facture.montant_ht * facture.tva) / 100) }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </strong>
+            </td>
+        </tr>
+        <tr style="background-color: #f0f0f0;">
+            <td class="label">Total TTC FCFA</td>
+            <td class="amount"><strong>{{ "{:,.0f}".format(facture.montant_ttc) if facture.montant_ttc else "0"
+                    }}</strong></td>
+        </tr>
+    </table>
+
+    <table class="header-table">
+        <tr>
+            <td class="company-info">
+                <!-- Conditions de paiement -->
+                <div class="payment-conditions">
+                    <div class="conditions-title">Conditions: <u></u></div>
+                    <div class="conditions-content">
+                        {% if facture.modalite_paiement %}
+                        <strong>Paiement:</strong> {{ facture.modalite_paiement }}
+                        {% else %}
+                        <strong>Paiement:</strong> 50% avance de démarrage<br>
+                        <strong>Paiement:</strong> 50% à la fin de la formation
+                        {% endif %}
+                    </div>
+                </div>
+            </td>
+            <td class="logo-section">
+                <!-- Section signature -->
+                <div class="signature-section">
+                    <div class="signature-title"><u>La Direction</u></div>
+                    <div style="height: 60px;">
+                        {% if signature_base64 %}
+                        <img src="{{ signature_base64 }}" alt="Signature" width="130">
+                        {% else %}
+                        <div style="padding: 20px; text-align: center; color: #999;">
+                        </div>
+                        {% endif %}
+                    </div> <!-- Espace pour la signature -->
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="footer">
+        La logistique au service de l’optimisation des flux
+    </div>
+
+    <!-- Conditions de paiement -->
+    <!-- <div class="payment-conditions">
+        <div class="conditions-title">[Conditions:] <u></u></div>
+        <div class="conditions-content">
+            {% if facture.modalite_paiement %}
+            <strong>Paiement:</strong> {{ facture.modalite_paiement }}
+            {% else %}
+            <strong>Paiement:</strong> 50% avance de démarrage<br>
+            <strong>Paiement:</strong> 50% à la fin de la formation
+            {% endif %}
+        </div>
+    </div> -->
+
+    <!-- Observations -->
+    <!-- {% if facture.observations %}
+    <div style="margin-bottom: 30px;">
+        <div style="font-weight: bold; text-decoration: underline; margin-bottom: 10px;">Observations:</div>
+        <div>{{ facture.observations|replace('\n', '<br>')|safe }}</div>
+    </div>
+    {% endif %} -->
+
+    <!-- Section signature -->
+    <!-- <div class="signature-section">
+        <div class="signature-title"><u>La Direction</u></div>
+        <div style="height: 60px;">
+            {% if signature_base64 %}
+            <img src="{{ signature_base64 }}" alt="Logo SANO LOGISTIC" class="logo">
+            {% else %}
+            <div style="padding: 20px; text-align: center; color: #999;">
+            </div>
+            {% endif %}
+        </div> 
+    </div> -->
+
+    <!-- Pied de page -->
+    <!-- <div class="footer">
+        Facture générée le {{ datetime.now().strftime('%d/%m/%Y à %H:%M') }}<br>
+        SANO-LOGISTIC - Tous droits réservés
+    </div> -->
+</body>
+
+</html>

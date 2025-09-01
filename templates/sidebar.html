@@ -66,7 +66,7 @@
                 <a href="{{ url_for('finance_list') }}"
                     class="nav-sub {% if request.endpoint == 'finance_list' %}active{% endif %}"><i
                         class="fas fa-coins mr-3"></i>Comptabilité Financière</a>
-                <a href="#" class="nav-sub {% if request.endpoint == 'facture_list' %}active{% endif %}">
+                <a href="{{ url_for('facture_list') }}" class="nav-sub {% if request.endpoint == 'facture_list' %}active{% endif %}">
                     <i class="fas fa-file-invoice mr-3"></i>Factures
                 </a>
             </div>
@@ -91,7 +91,7 @@
             <button @click="open = !open"
                 class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 hover:text-gray-900 ">
                 <i class="fas fa-file-signature mr-3 text-lg text-gray-400 group-hover:text-gray-500"></i>
-                Procès-verbaux
+                Procès Verbaux
                 <i class="fas fa-chevron-right ml-auto text-xs transition-transform duration-200"
                     :class="{'rotate-90': open}"></i>
             </button>

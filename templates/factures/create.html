@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block title %}Créer une Facture - KUNDA{% endblock %}
+{% block page_title %}Créer une Nouvelle Facture{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Nouvelle Facture</h3>
+                    <p class="mt-1 text-sm text-gray-500">Remplissez les informations pour créer une nouvelle facture
+                    </p>
+                </div>
+                <a href="{{ url_for('facture_list') }}"
+                    class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Retour
+                </a>
+            </div>
+        </div>
+
+        <form method="POST" class="px-6 py-6 space-y-6" x-data="factureForm()">
+            <!-- Date Facture -->
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                    <label for="date_facture" class="block text-sm font-medium text-gray-700 mb-1">
+                        Date de facture <span class="text-red-500">*</span>
+                    </label>
+                    <input type="date" name="date_facture" id="date_facture" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300">
+                </div>
+            </div>
+
+            <!-- Informations Client -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-user mr-2 text-green-600"></i>
+                    Informations Client
+                </h4>
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <label for="nom_client" class="block text-sm font-medium text-gray-700 mb-1">
+                            Nom du client <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="nom_client" id="nom_client" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300"
+                            placeholder="Nom complet du client">
+                    </div>
+
+                    <div>
+                        <label for="email_client" class="block text-sm font-medium text-gray-700 mb-1">
+                            Email du client
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-gray-400"></i>
+                            </div>
+                            <input type="email" name="email_client" id="email_client"
+                                class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 pl-10"
+                                placeholder="client@example.com">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="telephone_client" class="block text-sm font-medium text-gray-700 mb-1">
+                            Téléphone
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-phone text-gray-400"></i>
+                            </div>
+                            <input type="tel" name="telephone_client" id="telephone_client"
+                                class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 pl-10"
+                                placeholder="+221 XX XXX XX XX">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="adresse_client" class="block text-sm font-medium text-gray-700 mb-1">
+                            Adresse
+                        </label>
+                        <textarea name="adresse_client" id="adresse_client" rows="3"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300"
+                            placeholder="Adresse complète du client..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Articles et Quantités -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-box mr-2 text-green-600"></i>
+                    Articles et Quantités
+                </h4>
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <!-- Désignation -->
+                    <div class="sm:col-span-2">
+                        <label for="designation" class="block text-sm font-medium text-gray-700 mb-1">
+                            Désignation <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="designation" id="designation" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300"
+                            placeholder="Nom de l'article ou service">
+                    </div>
+
+                    <!-- Quantité -->
+                    <div>
+                        <label for="quantite" class="block text-sm font-medium text-gray-700 mb-1">
+                            Quantité
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-cubes text-gray-400"></i>
+                            </div>
+                            <input type="number" name="quantite" id="quantite" min="1"
+                                class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 pl-10"
+                                placeholder="1" x-on:input="calculateTotal()">
+                        </div>
+                    </div>
+
+                    <!-- Prix unitaire -->
+                    <div>
+                        <label for="prix_unitaire" class="block text-sm font-medium text-gray-700 mb-1">
+                            Prix unitaire (FCFA)
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-tag text-gray-400"></i>
+                            </div>
+                            <input type="number" name="prix_unitaire" id="prix_unitaire" step="0.01" min="0"
+                                class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 pl-10"
+                                placeholder="0.00" x-on:input="calculateTotal()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Détails financiers -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-calculator mr-2 text-green-600"></i>
+                    Détails financiers
+                </h4>
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div>
+                        <label for="montant_ht" class="block text-sm font-medium text-gray-700 mb-1">
+                            Montant HT (FCFA)
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-calculator text-gray-400"></i>
+                            </div>
+                            <input type="number" name="montant_ht" id="montant_ht" step="0.01" min="0" readonly
+                                class="block w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 pl-10 font-medium"
+                                placeholder="Calculé automatiquement">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="tva" class="block text-sm font-medium text-gray-700 mb-1">
+                            TVA (%)
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-400 text-sm">%</span>
+                            </div>
+                            <input type="number" name="tva" id="tva" step="0.01" min="0" max="100" value="0"
+                                class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 pl-10"
+                                placeholder="0" x-on:input="calculateTotal()">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="montant_ttc" class="block text-sm font-medium text-gray-700 mb-1">
+                            Montant TTC (FCFA)
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-money-bill-wave text-gray-400"></i>
+                            </div>
+                            <input type="number" name="montant_ttc" id="montant_ttc" step="0.01" min="0" readonly
+                                class="block w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 pl-10 font-medium"
+                                placeholder="Calculé automatiquement">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modalités de paiement -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-credit-card mr-2 text-green-600"></i>
+                    Modalités de paiement
+                </h4>
+                <div>
+                    <label for="modalite_paiement" class="block text-sm font-medium text-gray-700 mb-1">
+                        Modalité de paiement
+                    </label>
+                    <select name="modalite_paiement" id="modalite_paiement"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300">
+                        <option value="">Sélectionner la modalité</option>
+                        <option value="50% avance de démarrage">50% avance de démarrage</option>
+                        <option value="50% à la fin de la formation">50% à la fin de la formation</option>
+                        <option value="Comptant">Comptant</option>
+                        <option value="Crédit 30 jours">Crédit 30 jours</option>
+                        <option value="Crédit 60 jours">Crédit 60 jours</option>
+                        <option value="Crédit 90 jours">Crédit 90 jours</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Observations -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-comment mr-2 text-green-600"></i>
+                    Observations
+                </h4>
+                <div>
+                    <label for="observations" class="block text-sm font-medium text-gray-700 mb-1">
+                        Notes et observations
+                    </label>
+                    <textarea name="observations" id="observations" rows="4"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300"
+                        placeholder="Notes, remarques ou observations sur cette facture..."></textarea>
+                </div>
+            </div>
+
+            <!-- Résumé -->
+            <div class="border-t border-gray-200 pt-6">
+                <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-6 border border-green-200">
+                    <h4 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-file-invoice mr-2 text-green-600"></i>
+                        Résumé de la facture
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600" x-text="quantite || 0">0</div>
+                            <div class="text-sm text-blue-700">Quantité</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600" x-text="formatCurrency(prixUnitaire)">0 FCFA
+                            </div>
+                            <div class="text-sm text-green-700">Prix Unitaire</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-purple-600" x-text="formatCurrency(montantHT)">0 FCFA
+                            </div>
+                            <div class="text-sm text-purple-700">Montant HT</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-indigo-600" x-text="formatCurrency(montantTTC)">0 FCFA
+                            </div>
+                            <div class="text-sm text-indigo-700">Montant TTC</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-6">
+                <button type="submit"
+                    class="w-full inline-flex justify-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300">
+                    <i class="fas fa-plus mr-2"></i>
+                    Créer la facture
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function factureForm() {
+        return {
+            quantite: 0,
+            prixUnitaire: 0,
+            montantHT: 0,
+            montantTTC: 0,
+
+            calculateTotal() {
+                const quantite = parseFloat(document.getElementById('quantite').value) || 0;
+                const prixUnitaire = parseFloat(document.getElementById('prix_unitaire').value) || 0;
+                const tva = parseFloat(document.getElementById('tva').value) || 0;
+
+                // Calculate HT amount
+                const montantHT = quantite * prixUnitaire;
+                document.getElementById('montant_ht').value = montantHT.toFixed(2);
+
+                // Calculate TTC amount
+                const montantTTC = montantHT + (montantHT * tva / 100);
+                document.getElementById('montant_ttc').value = montantTTC.toFixed(2);
+
+                // Update reactive data
+                this.quantite = quantite;
+                this.prixUnitaire = prixUnitaire;
+                this.montantHT = montantHT;
+                this.montantTTC = montantTTC;
+            },
+
+            formatCurrency(amount) {
+                return new Intl.NumberFormat('fr-FR').format(amount) + ' FCFA';
+            }
+        };
+    }
+
+    // Set today's date by default
+    document.addEventListener('DOMContentLoaded', function () {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date_facture').value = today;
+    });
+</script>
+{% endblock %}

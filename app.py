@@ -1,7 +1,7 @@
 from functools import wraps
 import io
 import os
-from flask import Flask, Response, render_template, jsonify, request, redirect, url_for, flash, session, send_file
+from flask import Flask, Response, render_template, jsonify, request, redirect, url_for, flash, session, send_file, current_app
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 import hashlib
@@ -9,10 +9,13 @@ import pandas as pd
 from datetime import datetime, time, timedelta, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+from xhtml2pdf import pisa
+import tempfile
+import base64
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=15)
 
@@ -176,6 +179,7 @@ class Facture(db.Model):
     adresse_client = db.Column(db.Text, nullable=True)
     telephone_client = db.Column(db.String(20), nullable=True)
     email_client = db.Column(db.String(100), nullable=True)
+    designation = db.Column(db.String(255), nullable=False)
     quantite = db.Column(db.Integer, nullable=True)
     prix_unitaire = db.Column(db.Numeric(10, 2), nullable=True)
     montant_ht = db.Column(db.Numeric(10, 2), nullable=True)
@@ -576,7 +580,7 @@ def trading_list():
     tradings = query.paginate(
         page=page, per_page=10, error_out=False
     )
-    return render_template('trading/list.html', tradings=tradings, search=search)
+    return render_template('trading/list.html', tradings=tradings, search=search, min=min)
 
 @app.route('/trading/create', methods=['GET', 'POST'])
 @login_required
@@ -664,7 +668,7 @@ def trading_edit(id):
 
 @app.route('/trading/<int:id>/delete', methods=['POST'])
 @login_required
-@admin_required
+@role_required('Trading')
 def trading_delete(id):
     trading = Trading.query.get_or_404(id)
     try:
@@ -701,7 +705,7 @@ def academy_list():
     academies = query.paginate(
         page=page, per_page=10, error_out=False
     )
-    return render_template('academy/list.html', academies=academies, search=search)
+    return render_template('academy/list.html', academies=academies, search=search, min=min)
 
 @app.route('/academy/create', methods=['GET', 'POST'])
 @login_required
@@ -787,7 +791,7 @@ def academy_edit(id):
 
 @app.route('/academy/<int:id>/delete', methods=['POST'])
 @login_required
-@admin_required
+@role_required('Academy')
 def academy_delete(id):
     academy = Academy.query.get_or_404(id)
     try:
@@ -825,7 +829,7 @@ def digital_list():
     digitals = query.paginate(
         page=page, per_page=10, error_out=False
     )
-    return render_template('digital/list.html', digitals=digitals, search=search)
+    return render_template('digital/list.html', digitals=digitals, search=search, min=min)
 
 @app.route('/digital/create', methods=['GET', 'POST'])
 @login_required
@@ -911,7 +915,7 @@ def digital_edit(id):
 
 @app.route('/digital/<int:id>/delete', methods=['POST'])
 @login_required
-@admin_required
+@role_required('Digital')
 def digital_delete(id):
     digital = Digital.query.get_or_404(id)
     try:
@@ -944,7 +948,7 @@ def materiel_list():
     materiels = query.paginate(
         page=page, per_page=10, error_out=False
     )
-    return render_template('materiel/list.html', materiels=materiels, search=search)
+    return render_template('materiel/list.html', materiels=materiels, search=search, min=min)
 
 @app.route('/materiel/create', methods=['GET', 'POST'])
 @login_required
@@ -1018,7 +1022,7 @@ def materiel_edit(id):
 
 @app.route('/materiel/<int:id>/delete', methods=['POST'])
 @login_required
-@admin_required
+@role_required('Comptabilite')
 def materiel_delete(id):
     materiel = Materiel.query.get_or_404(id)
     try:
@@ -1051,7 +1055,7 @@ def finance_list():
     finances = query.paginate(
         page=page, per_page=10, error_out=False
     )
-    return render_template('finance/list.html', finances=finances, search=search)
+    return render_template('finance/list.html', finances=finances, search=search, min=min)
 
 @app.route('/finance/create', methods=['GET', 'POST'])
 @login_required
@@ -1124,7 +1128,7 @@ def finance_edit(id):
 
 @app.route('/finance/<int:id>/delete', methods=['POST'])
 @login_required
-@admin_required
+@role_required('Comptabilite')
 def finance_delete(id):
     finance = Finance.query.get_or_404(id)
     try:
@@ -1167,7 +1171,7 @@ def personnel_list():
         page=page, per_page=10, error_out=False
     )
     
-    return render_template('personnel/list.html', personnel=personnel, search=search, departement=departement)
+    return render_template('personnel/list.html', personnel=personnel, search=search, departement=departement, min=min)
 
 @app.route('/personnel/create', methods=['GET', 'POST'])
 @login_required
@@ -1353,7 +1357,7 @@ def projet_list():
     projets = query.paginate(
         page=page, per_page=10, error_out=False
     )
-    return render_template('projet/list.html', projets=projets, search=search, departement=departement)
+    return render_template('projet/list.html', projets=projets, search=search, departement=departement, min=min)
 
 @app.route('/projet/create', methods=['GET', 'POST'])
 @login_required
@@ -1458,7 +1462,7 @@ def evenementiel_list():
     evenementiels = query.paginate(
         page=page, per_page=10, error_out=False
     )
-    return render_template('evenementiel/list.html', evenementiels=evenementiels, search=search, departement=departement)
+    return render_template('evenementiel/list.html', evenementiels=evenementiels, search=search, departement=departement, min=min)
 
 @app.route('/evenementiel/create', methods=['GET', 'POST'])
 @login_required
@@ -1573,7 +1577,7 @@ def rapport_list():
     rapports = query.order_by(Rapport.date_creation.desc()).paginate(
         page=page, per_page=10, error_out=False
     )
-    return render_template('rapport/list.html', rapports=rapports, search=search)
+    return render_template('rapport/list.html', rapports=rapports, search=search, min=min)
 
 @app.route('/rapport/create', methods=['GET', 'POST'])
 @login_required
@@ -1872,7 +1876,7 @@ def proces_verbal_list():
     return render_template('proces_verbal/list.html', 
                          proces_verbaux=proces_verbaux, 
                          search=search, 
-                         statut=statut)
+                         statut=statut, min=min)
 
 @app.route('/proces-verbal/create', methods=['GET', 'POST'])
 @login_required
@@ -2060,6 +2064,204 @@ def personnel_search():
         })
     
     return jsonify(results)
+
+@app.route('/factures')
+@login_required
+@role_required('Comptabilite', 'Trading', 'Academy', 'Digital', 'Administrator')
+def facture_list():
+    page = request.args.get('page', 1, type=int)
+    search = request.args.get('search', '', type=str)
+    query = Facture.query
+    if search:
+        query = query.filter(
+            (Facture.nom_client.contains(search)) |
+            (Facture.email_client.contains(search)) |
+            (Facture.telephone_client.contains(search)) |
+            (Facture.designation.contains(search)) |
+            (Facture.numero_facture.contains(search))
+        )
+    factures = query.order_by(Facture.date_facture.desc()).paginate(
+        page=page, per_page=10, error_out=False
+    )
+    return render_template('factures/list.html', factures=factures, search=search, min=min)
+
+@app.route('/factures/create', methods=['GET', 'POST'])
+@login_required
+@role_required('Comptabilite', 'Trading', 'Academy', 'Digital', 'Administrator')
+def facture_create():
+    if request.method == 'POST':
+        try:
+            # Générer un numéro de facture unique
+            now = datetime.now()
+            numero_facture = f"FACT-{now.strftime('%Y%m%d')}-{Facture.query.count() + 1:04d}"
+            
+            facture = Facture(
+                numero_facture=numero_facture,
+                nom_client=request.form.get('nom_client'),
+                adresse_client=request.form.get('adresse_client'),
+                telephone_client=request.form.get('telephone_client'),
+                email_client=request.form.get('email_client'),
+                designation=request.form.get('designation'),
+                quantite=int(request.form['quantite']) if request.form.get('quantite') else None,
+                prix_unitaire=float(request.form['prix_unitaire']) if request.form.get('prix_unitaire') else None,
+                montant_ht=float(request.form['montant_ht']) if request.form.get('montant_ht') else None,
+                tva=float(request.form['tva']) if request.form.get('tva') else None,
+                montant_ttc=float(request.form['montant_ttc']) if request.form.get('montant_ttc') else None,
+                modalite_paiement=request.form.get('modalite_paiement'),
+                date_facture=datetime.strptime(request.form['date_facture'], '%Y-%m-%d') if request.form.get('date_facture') else datetime.now(),
+                observations=request.form.get('observations'),
+                personnel_id=session.get('id')
+            )
+            db.session.add(facture)
+            db.session.flush()  # Pour obtenir l'ID de la facture créée
+            
+            # Enregistrement dans le journal
+            log_activity(
+                action='CREATION_FACTURE',
+                description=f"Création d'une nouvelle facture {facture.numero_facture} - Client: {facture.nom_client}"
+            )
+            db.session.commit()
+            flash('Facture créée avec succès!', 'success')
+            return redirect(url_for('facture_detail', id=facture.id))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Erreur lors de la création de la facture: {str(e)}', 'error')
+    return render_template('factures/create.html')
+
+@app.route('/factures/<int:id>')
+@login_required
+@role_required('Comptabilite', 'Trading', 'Academy', 'Digital', 'Administrator')
+def facture_detail(id):
+    facture = Facture.query.get_or_404(id)
+    return render_template('factures/detail.html', facture=facture, datetime=datetime, timezone=timezone)
+
+@app.route('/factures/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+@role_required('Comptabilite', 'Trading', 'Academy', 'Digital', 'Administrator')
+def facture_edit(id):
+    facture = Facture.query.get_or_404(id)
+    if request.method == 'POST':
+        try:
+            facture.nom_client = request.form.get('nom_client')
+            facture.adresse_client = request.form.get('adresse_client')
+            facture.telephone_client = request.form.get('telephone_client')
+            facture.email_client = request.form.get('email_client')
+            facture.designation = request.form.get('designation')
+            facture.quantite = int(request.form['quantite']) if request.form.get('quantite') else None
+            facture.prix_unitaire = float(request.form['prix_unitaire']) if request.form.get('prix_unitaire') else None
+            facture.montant_ht = float(request.form['montant_ht']) if request.form.get('montant_ht') else None
+            facture.tva = float(request.form['tva']) if request.form.get('tva') else None
+            facture.montant_ttc = float(request.form['montant_ttc']) if request.form.get('montant_ttc') else None
+            facture.modalite_paiement = request.form.get('modalite_paiement')
+            facture.date_facture = datetime.strptime(request.form['date_facture'], '%Y-%m-%d') if request.form.get('date_facture') else facture.date_facture
+            facture.observations = request.form.get('observations')
+
+            # Enregistrement dans le journal
+            log_activity(
+                action='MISE_A_JOUR_FACTURE',
+                description=f"Mise à jour de la facture {facture.numero_facture} - Client: {facture.nom_client}"
+            )
+
+            db.session.commit()
+            flash('Facture mise à jour avec succès!', 'success')
+            return redirect(url_for('facture_detail', id=id))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Erreur lors de la mise à jour de la facture: {str(e)}', 'error')
+    return render_template('factures/edit.html', facture=facture)
+
+@app.route('/factures/<int:id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def facture_delete(id):
+    facture = Facture.query.get_or_404(id)
+    try:
+        # Enregistrement dans le journal
+        log_activity(
+            action='SUPPRESSION_FACTURE',
+            description=f"Suppression de la facture {facture.numero_facture} - Client: {facture.nom_client}"
+        )
+        db.session.delete(facture)
+        db.session.commit()
+        flash('Facture supprimée avec succès!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Erreur lors de la suppression de la facture: {str(e)}', 'error')
+    return redirect(url_for('facture_list'))
+
+@app.route('/factures/<int:id>/pdf')
+@login_required
+@role_required('Comptabilite', 'Trading', 'Academy', 'Digital', 'Administrator')
+def facture_pdf(id):
+    facture = Facture.query.get_or_404(id)
+    
+    # Fonction pour convertir l'image en base64
+    def get_logo_base64(image):
+        try:
+            # Chemin vers le logo dans le dossier static
+            logo_path = os.path.join(current_app.static_folder, 'img', image)
+            
+            # Vérifier si le fichier existe
+            if os.path.exists(logo_path):
+                with open(logo_path, 'rb') as img_file:
+                    img_data = img_file.read()
+                    # Encoder en base64
+                    img_base64 = base64.b64encode(img_data).decode('utf-8')
+                    
+                    # Déterminer le type MIME basé sur l'extension
+                    if logo_path.lower().endswith('.png'):
+                        mime_type = 'image/png'
+                    elif logo_path.lower().endswith(('.jpg', '.jpeg')):
+                        mime_type = 'image/jpeg'
+                    elif logo_path.lower().endswith('.gif'):
+                        mime_type = 'image/gif'
+                    else:
+                        mime_type = 'image/png'  # Par défaut
+                    
+                    return f"data:{mime_type};base64,{img_base64}"
+            else:
+                # Retourner None si le logo n'existe pas
+                return None
+        except Exception as e:
+            print(f"Erreur lors du chargement du logo: {e}")
+            return None
+    
+    # Obtenir le logo en base64
+    logo_base64 = get_logo_base64('logoSLCblanc.jpg')
+    signature_base64 = get_logo_base64('signature.jpg')
+    
+    # Rendu du template HTML de la facture
+    html_content = render_template(
+        'factures/pdf_template.html', 
+        facture=facture, 
+        datetime=datetime,
+        logo_base64=logo_base64,
+        signature_base64=signature_base64
+    )
+    
+    # Création d'un fichier temporaire
+    with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp_file:
+        # Conversion HTML vers PDF
+        pisa_status = pisa.CreatePDF(html_content, dest=tmp_file)
+        
+        if pisa_status.err:
+            flash('Erreur lors de la génération du PDF', 'error')
+            return redirect(url_for('facture_detail', id=id))
+        
+        tmp_file.seek(0)
+        
+        # Enregistrement dans le journal
+        log_activity(
+            action='GENERATION_PDF_FACTURE',
+            description=f"Génération PDF de la facture {facture.numero_facture}"
+        )
+        
+        return send_file(
+            tmp_file.name,
+            as_attachment=True,
+            download_name=f"facture_{facture.numero_facture}.pdf",
+            mimetype='application/pdf'
+        )
 
 # Route de connexion
 @app.route('/login', methods=['GET', 'POST'])
