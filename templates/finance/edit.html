@@ -80,7 +80,7 @@
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-arrow-up text-green-400"></i>
+                                <i class="fas fa-arrow-down text-red-400"></i>
                             </div>
                             <input type="number" 
                                    name="credit" 
@@ -92,7 +92,7 @@
                                    placeholder="0.00"
                                    x-on:input="calculateTTC()">
                         </div>
-                        <p class="mt-1 text-sm text-green-600">Entrée d'argent (recettes)</p>
+                        <p class="mt-1 text-sm text-red-600">Sortie d'argent (dépenses)</p>
                     </div>
 
                     <div>
@@ -101,7 +101,7 @@
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-arrow-down text-red-400"></i>
+                                <i class="fas fa-arrow-up text-green-400"></i>
                             </div>
                             <input type="number" 
                                    name="debit" 
@@ -113,7 +113,7 @@
                                    placeholder="0.00"
                                    x-on:input="calculateTTC()">
                         </div>
-                        <p class="mt-1 text-sm text-red-600">Sortie d'argent (dépenses)</p>
+                        <p class="mt-1 text-sm text-green-600">Entrée d'argent (recettes)</p>
                     </div>
                 </div>
             </div>

@@ -23,7 +23,6 @@
             </div>
 
             <!-- Add button -->
-            {% if session.role in ['Administrator', 'Comptabilite', 'Trading'] %}
             <div class="flex items-center space-x-4">
                 <a href="{{ url_for('facture_create') }}" 
                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 transform hover:scale-105">
@@ -31,7 +30,6 @@
                     Nouvelle Facture
                 </a>
             </div>
-            {% endif %}
         </div>
     </div>
 
